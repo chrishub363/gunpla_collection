@@ -1,0 +1,38 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined. If you add columns to the
+# model remove the "{}" from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+# == Schema Information
+#
+# Table name: kits
+#
+#  id             :integer          not null, primary key
+#  brand          :string
+#  full_title     :string
+#  grade          :string
+#  grade_abbr     :string
+#  image_url      :string
+#  scale          :string
+#  scalemates_url :string
+#  series         :string
+#  status         :string           default("unbuilt"), not null
+#  title          :string           not null
+#  topic          :string
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  scalemates_id  :integer
+#
+# Indexes
+#
+#  index_kits_on_grade_abbr     (grade_abbr)
+#  index_kits_on_scalemates_id  (scalemates_id) UNIQUE
+#  index_kits_on_series         (series)
+#  index_kits_on_status         (status)
+#
+one: {}
+# column: value
+#
+two: {}
+# column: value
