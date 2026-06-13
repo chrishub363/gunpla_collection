@@ -4,9 +4,12 @@ require "open3"
 require "nokogiri"
 
 namespace :enrich do
-  desc "Scrape ScaleMates for image_url, full_title, grade, and series for all kits"
-  task kits: :environment do
+  desc "Scrape ScaleMates for image_url, full_title, and grade for all kits. Use enrich:kits[force] to re-enrich everything."
+  task :kits, [ :mode ] => :environment do |_task, args|
     $stdout.sync = true
+
+    force = args[:mode] == "force"
+
     csv_files = {
       "wishlist"    => Rails.root.join("db/seeds/My-Wishlist.csv"),
       "unbuilt"     => Rails.root.join("db/seeds/My-Stash.csv"),
@@ -16,38 +19,51 @@ namespace :enrich do
 
     output_path = Rails.root.join("db/seeds/enriched_kits.json")
 
-    existing = if output_path.exist?
+    existing = if force
+      puts "Force mode — re-enriching all kits..."
+      {}
+    elsif output_path.exist?
+      puts "Loading existing enriched data, skipping already-enriched kits..."
       JSON.parse(output_path.read).index_by { |k| k["scalemates_id"] }
     else
       {}
     end
 
-    kits = []
-
+    all_rows = []
     csv_files.each do |status, path|
       CSV.foreach(path, headers: true) do |row|
-        url = row["Link"]
-        next unless url.present?
-
-        scalemates_id = url.match(/--(\d+)$/)&.captures&.first&.to_i
+        next unless row["Link"].present?
+        scalemates_id = row["Link"].match(/--(\d+)$/)&.captures&.first&.to_i
         next unless scalemates_id
+        all_rows << { status: status, row: row, scalemates_id: scalemates_id, url: row["Link"] }
+      end
+    end
 
-        if existing[scalemates_id]
-          puts "Skipping #{scalemates_id} (already enriched)"
-          kits << existing[scalemates_id]
-          next
-        end
+    total = all_rows.size
+    kits = []
 
-        puts "Scraping #{scalemates_id}: #{row['Title']}..."
+    all_rows.each_with_index do |entry, index|
+      counter = "[#{(index + 1).to_s.rjust(total.to_s.length, "0")}/#{total}]"
+      status = entry[:status]
+      row = entry[:row]
+      scalemates_id = entry[:scalemates_id]
+      url = entry[:url]
 
-        begin
-          enriched = scrape_kit(url, row, status, scalemates_id)
-          kits << enriched
-          sleep 1
-        rescue StandardError => e
-          puts "  ERROR: #{e.message} — using CSV data only"
-          kits << csv_fallback(row, status, scalemates_id, url)
-        end
+      if existing[scalemates_id]
+        puts "#{counter} Skipping #{scalemates_id} (already enriched)"
+        kits << existing[scalemates_id]
+        next
+      end
+
+      puts "#{counter} Scraping #{scalemates_id}: #{row['Title']}..."
+
+      begin
+        enriched = scrape_kit(url, row, status, scalemates_id)
+        kits << enriched
+        sleep 1
+      rescue StandardError => e
+        puts "  ERROR: #{e.message} — using CSV data only"
+        kits << csv_fallback(row, status, scalemates_id, url)
       end
     end
 
@@ -74,9 +90,7 @@ namespace :enrich do
     image_url  = doc.at('meta[property="og:image"]')&.[]("content")
     full_title = doc.at('meta[property="og:title"]')&.[]("content")
     h1         = doc.at("h1")&.text&.strip
-    h2         = doc.at("h2")&.text&.strip
-
-    grade, series = parse_grade_and_series(h1, h2)
+    grade      = parse_grade(h1)
 
     {
       "scalemates_id"  => scalemates_id,
@@ -89,12 +103,12 @@ namespace :enrich do
       "full_title"     => full_title,
       "image_url"      => image_url,
       "grade"          => grade,
-      "series"         => series
+      "series"         => nil
     }
   end
 
-  def parse_grade_and_series(h1, h2)
-    return [ nil, nil ] unless h1
+  def parse_grade(h1)
+    return nil unless h1
 
     grade_patterns = {
       /\AHigh Grade\b/i     => "High Grade",
@@ -107,13 +121,9 @@ namespace :enrich do
       /\ANo Grade\b/i       => "No Grade"
     }
 
-    grade = grade_patterns.each_with_object(nil) do |(pattern, name), _found|
+    grade_patterns.each_with_object(nil) do |(pattern, name), _found|
       break name if h1.match?(pattern)
     end
-
-    series = grade ? h2 : nil
-
-    [ grade, series ]
   end
 
   def csv_fallback(row, status, scalemates_id, url)
