@@ -1,0 +1,12 @@
+<% kits.each_with_index do |kit, index| %>
+  <%= render "kit", kit: kit, index: index, show_status: show_status %>
+<% end %>
+
+<% if pagy.next %>
+  <div id="scroll_sentinel" data-infinite-scroll-target="sentinel" class="py-4 text-center">
+    <%= link_to "Load more",
+        request.path + "?" + request.query_parameters.merge(page: pagy.next).to_query,
+        data: { turbo_frame: "kits_grid" },
+        class: "text-xs text-[#9d8faa]" %>
+  </div>
+<% end %>

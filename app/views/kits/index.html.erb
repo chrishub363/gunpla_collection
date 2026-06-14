@@ -1,0 +1,136 @@
+<% if request.headers["Turbo-Frame"] == "kits_grid" && params[:page].blank? %>
+  <%# Filter/search request — render just the grid contents, sidebar stays put %>
+  <%= turbo_frame_tag "kits_grid", class: "flex-1 min-w-0" do %>
+    <div data-controller="infinite-scroll">
+      <% if @kits.any? %>
+        <div class="text-xs text-[#9d8faa] mb-3"><%= @pagy.count %> kits</div>
+        <div class="rounded-xl overflow-hidden border border-[#2d2640]" id="kits_list">
+          <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+        </div>
+      <% else %>
+        <div class="text-center py-24 text-[#9d8faa]">
+          <div class="text-4xl mb-4">📦</div>
+          <div class="text-lg font-medium">No kits found</div>
+          <div class="text-sm mt-1">Try adjusting your filters</div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+<% elsif params[:page].present? %>
+  <%# Subsequent pages — just render new rows into the existing list %>
+  <%= turbo_frame_tag "kits_grid" do %>
+    <div data-controller="infinite-scroll">
+      <div id="kits_list">
+        <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+      </div>
+    </div>
+  <% end %>
+
+<% else %>
+  <%# Full page load — render complete layout with sidebar %>
+  <div class="flex gap-6">
+
+    <%# Kit grid %>
+    <%= turbo_frame_tag "kits_grid", class: "flex-1 min-w-0" do %>
+      <div data-controller="infinite-scroll">
+        <% if @kits.any? %>
+          <div class="text-xs text-[#9d8faa] mb-3"><%= @pagy.count %> kits</div>
+          <div class="rounded-xl overflow-hidden border border-[#2d2640]" id="kits_list">
+            <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+          </div>
+        <% else %>
+          <div class="text-center py-24 text-[#9d8faa]">
+            <div class="text-4xl mb-4">📦</div>
+            <div class="text-lg font-medium">No kits found</div>
+            <div class="text-sm mt-1">Try adjusting your filters</div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Sidebar filters — right side %>
+    <aside class="w-56 shrink-0">
+      <%= form_with url: root_path, method: :get,
+          data: { turbo_frame: "kits_grid", controller: "auto-submit" } do |f| %>
+        <%= f.hidden_field :tab, value: @tab %>
+
+        <%# Free text filter %>
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Filter</h3>
+          <%= f.text_field :search,
+              value: params[:search],
+              placeholder: "Search...",
+              data: { action: "input->auto-submit#submit" },
+              class: "w-full bg-[#251f33] border border-[#2d2640] rounded-lg px-3 py-2 text-sm text-[#f0e6ff] placeholder-[#9d8faa] focus:outline-none focus:border-[#e879a0] transition-colors" %>
+        </div>
+
+        <%# Status filter — collection only %>
+        <% if @tab != "wishlist" %>
+          <div class="mb-6">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Status</h3>
+            <div class="space-y-1">
+              <%= f.radio_button :status, "", checked: params[:status].blank?, class: "hidden", id: "status_all",
+                  data: { action: "change->auto-submit#submit" } %>
+              <%= label_tag "status_all", "All", class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:status].blank? ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+              <% @statuses.each do |status| %>
+                <%= f.radio_button :status, status, checked: params[:status] == status, class: "hidden", id: "status_#{status}",
+                    data: { action: "change->auto-submit#submit" } %>
+                <%= label_tag "status_#{status}", status.humanize.gsub("_", " "), class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:status] == status ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# Grade filter %>
+        <% if @grades.any? %>
+          <div class="mb-6">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Grade</h3>
+            <div class="space-y-1">
+              <%= f.radio_button :grade, "", checked: params[:grade].blank?, class: "hidden", id: "grade_all",
+                  data: { action: "change->auto-submit#submit" } %>
+              <%= label_tag "grade_all", "All", class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:grade].blank? ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+              <% @grades.each do |grade| %>
+                <%= f.radio_button :grade, grade, checked: params[:grade] == grade, class: "hidden", id: "grade_#{grade}",
+                    data: { action: "change->auto-submit#submit" } %>
+                <%= label_tag "grade_#{grade}", grade, class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:grade] == grade ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# Scale filter %>
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Scale</h3>
+          <div class="space-y-1">
+            <%= f.radio_button :scale, "", checked: params[:scale].blank?, class: "hidden", id: "scale_all",
+                data: { action: "change->auto-submit#submit" } %>
+            <%= label_tag "scale_all", "All", class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:scale].blank? ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+            <% @scales.each do |scale| %>
+              <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: "scale_#{scale.gsub(':', '_')}",
+                  data: { action: "change->auto-submit#submit" } %>
+              <%= label_tag "scale_#{scale.gsub(':', '_')}", scale, class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:scale] == scale ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Brand filter %>
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Brand</h3>
+          <div class="space-y-1">
+            <%= f.radio_button :brand, "", checked: params[:brand].blank?, class: "hidden", id: "brand_all",
+                data: { action: "change->auto-submit#submit" } %>
+            <%= label_tag "brand_all", "All", class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:brand].blank? ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+            <% @brands.each do |brand| %>
+              <%= f.radio_button :brand, brand, checked: params[:brand] == brand, class: "hidden", id: "brand_#{brand.parameterize}",
+                  data: { action: "change->auto-submit#submit" } %>
+              <%= label_tag "brand_#{brand.parameterize}", brand, class: "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors #{params[:brand] == brand ? 'bg-[#e879a0] text-white' : 'text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]'}" %>
+            <% end %>
+          </div>
+        </div>
+
+      <% end %>
+    </aside>
+
+  </div>
+<% end %>

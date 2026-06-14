@@ -1,0 +1,14 @@
+<%= turbo_stream.append "kits_list" do %>
+  <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+<% end %>
+
+<%= turbo_stream.replace "scroll_sentinel" do %>
+  <% if @pagy.next %>
+    <div id="scroll_sentinel" data-infinite-scroll-target="sentinel" class="py-4 text-center">
+      <%= link_to "Load more",
+          request.path + "?" + request.query_parameters.merge(page: @pagy.next).to_query,
+          data: { turbo_frame: "kits_grid" },
+          class: "text-xs text-[#9d8faa]" %>
+    </div>
+  <% end %>
+<% end %>

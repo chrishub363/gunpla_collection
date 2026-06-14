@@ -1,0 +1,35 @@
+<div class="flex gap-4 p-3 <%= index.odd? ? 'bg-[#211d2e]' : 'bg-[#1e1a2e]' %> hover:bg-[#251f33] transition-colors">
+
+  <%# Box art %>
+  <div class="shrink-0 w-36 h-24 bg-[#2d2640] rounded overflow-hidden">
+    <% if kit.image_url.present? %>
+      <img src="<%= kit.image_url %>" alt="<%= kit.title %>" class="w-full h-full object-cover">
+    <% end %>
+  </div>
+
+  <%# Kit info %>
+  <div class="flex-1 min-w-0 flex flex-col justify-center">
+    <div class="font-medium text-[#f0e6ff] truncate"><%= kit.title %></div>
+    <div class="text-sm text-[#9d8faa] mt-0.5">
+      <%= [kit.brand, kit.scale, kit.grade].compact.join(" · ") %>
+    </div>
+    <% if kit.topic.present? %>
+      <div class="text-xs text-[#8b7fa0] mt-0.5 truncate"><%= kit.topic %></div>
+    <% end %>
+  </div>
+
+  <%# Status badge %>
+  <% if local_assigns[:show_status] %>
+    <div class="shrink-0 flex items-center">
+      <% case kit.status %>
+      <% when "completed" %>
+        <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-900/40 text-green-400">✓ Built</span>
+      <% when "in_progress" %>
+        <span class="text-xs font-medium px-2 py-1 rounded-full bg-amber-900/40 text-amber-400">⚙ Building</span>
+      <% when "unbuilt" %>
+        <span class="text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]">Unbuilt</span>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
