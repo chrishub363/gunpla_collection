@@ -1,9 +1,25 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+require "json"
+
+puts "Seeding kits..."
+
+enriched_path = Rails.root.join("db/seeds/enriched_kits.json")
+kits_data = JSON.parse(enriched_path.read)
+
+Kit.destroy_all
+
+kits_data.each do |data|
+  Kit.create!(
+    title:          data["title"],
+    full_title:     data["full_title"],
+    grade:          data["grade"],
+    scale:          data["scale"],
+    brand:          data["brand"],
+    topic:          data["topic"],
+    image_url:      data["image_url"],
+    scalemates_id:  data["scalemates_id"],
+    scalemates_url: data["scalemates_url"],
+    status:         data["status"],
+  )
+end
+
+puts "Done! #{Kit.count} kits seeded."

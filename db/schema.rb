@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_07_212137) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_000508) do
   create_table "kits", force: :cascade do |t|
     t.string "brand"
     t.datetime "created_at", null: false
@@ -27,7 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_212137) do
     t.string "topic"
     t.datetime "updated_at", null: false
     t.index ["grade_abbr"], name: "index_kits_on_grade_abbr"
-    t.index ["scalemates_id"], name: "index_kits_on_scalemates_id", unique: true
+    t.index ["scalemates_id"], name: "index_kits_on_scalemates_id"
     t.index ["series"], name: "index_kits_on_series"
     t.index ["status"], name: "index_kits_on_status"
   end

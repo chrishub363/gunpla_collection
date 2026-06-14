@@ -21,7 +21,7 @@
 # Indexes
 #
 #  index_kits_on_grade_abbr     (grade_abbr)
-#  index_kits_on_scalemates_id  (scalemates_id) UNIQUE
+#  index_kits_on_scalemates_id  (scalemates_id)
 #  index_kits_on_series         (series)
 #  index_kits_on_status         (status)
 #
