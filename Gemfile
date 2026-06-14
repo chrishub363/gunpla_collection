@@ -37,7 +37,7 @@ gem "bootsnap", require: false
 gem "kamal", require: false
 gem "nokogiri"
 gem "csv"
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 43.5"
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
