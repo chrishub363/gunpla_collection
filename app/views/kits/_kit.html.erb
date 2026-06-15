@@ -11,7 +11,17 @@
 
   <%# Kit info %>
   <div class="flex-1 min-w-0 flex flex-col justify-center">
-    <div class="font-medium text-[#f0e6ff] truncate"><%= kit.title %></div>
+    <div class="font-medium text-[#f0e6ff] flex items-center gap-1.5 min-w-0">
+      <span class="truncate min-w-0"><%= kit.title %></span>
+      <% if kit.scalemates_url.present? %>
+        <%= link_to kit.scalemates_url, target: "_blank", rel: "noopener noreferrer",
+            class: "shrink-0 text-[#9d8faa] hover:text-[#e879a0] transition-colors p-1 -m-1 rounded" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        <% end %>
+      <% end %>
+    </div>
     <div class="text-sm text-[#9d8faa] mt-0.5">
       <%= [kit.brand, kit.scale, kit.grade].compact.join(" · ") %>
     </div>
