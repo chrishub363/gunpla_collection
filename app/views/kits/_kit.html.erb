@@ -1,4 +1,6 @@
-<div class="flex gap-4 p-3 <%= index.odd? ? 'bg-[#211d2e]' : 'bg-[#1e1a2e]' %> hover:bg-[#251f33] transition-colors">
+<div class="flex gap-4 p-3 <%= index.odd? ? 'bg-[#211d2e]' : 'bg-[#1e1a2e]' %> hover:bg-[#251f33] transition-colors"
+     data-filter-target="row"
+     data-filter-text="<%= [kit.title, kit.full_title, kit.brand, kit.scale, kit.grade, kit.topic].compact.join(' ').downcase %>">
 
   <%# Box art %>
   <div class="shrink-0 w-36 h-24 bg-[#2d2640] rounded overflow-hidden">
