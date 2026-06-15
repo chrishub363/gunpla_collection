@@ -59,11 +59,11 @@ class Kit < ApplicationRecord
   scope :unbuilt, -> { where(status: "unbuilt") }
 
   def subtitle
-    [brand, scale, grade].compact.join(" · ")
+    [ brand, scale, grade ].compact.join(" · ")
   end
 
   def filter_text
-    [title, full_title, brand, scale, grade, topic].compact.join(" ").downcase
+    [ title, full_title, brand, scale, grade, topic ].compact.join(" ").downcase
   end
 
   private
