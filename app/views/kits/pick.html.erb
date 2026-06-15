@@ -1,4 +1,102 @@
-<div>
-  <h1 class="font-bold text-4xl">Kits#pick</h1>
-  <p>Find me in app/views/kits/pick.html.erb</p>
+<div class="max-w-2xl mx-auto">
+
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#f0e6ff] mb-1">🎲 Pick a Kit</h1>
+    <p class="text-sm text-[#9d8faa]">Narrow it down, then let fate decide.</p>
+  </div>
+
+  <%= form_with url: pick_path, method: :get do |f| %>
+    <div class="bg-[#1e1a2e] border border-[#2d2640] rounded-xl p-6 mb-4 space-y-5">
+
+      <%# Grade %>
+      <% if @grades.any? %>
+        <div data-controller="pill-select" data-action="change->pill-select#refresh">
+          <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Grade</div>
+          <div class="flex flex-wrap gap-2">
+            <%= f.radio_button :grade, "", checked: params[:grade].blank?, class: "hidden", id: "pick_grade_all" %>
+            <%= label_tag "pick_grade_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:grade].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% @grades.each do |grade| %>
+              <%= f.radio_button :grade, grade, checked: params[:grade] == grade, class: "hidden", id: "pick_grade_#{grade}" %>
+              <%= label_tag "pick_grade_#{grade}", grade, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:grade] == grade ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Scale %>
+      <% if @scales.any? %>
+        <div data-controller="pill-select" data-action="change->pill-select#refresh">
+          <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Scale</div>
+          <div class="flex flex-wrap gap-2">
+            <%= f.radio_button :scale, "", checked: params[:scale].blank?, class: "hidden", id: "pick_scale_all" %>
+            <%= label_tag "pick_scale_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:scale].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% @scales.each do |scale| %>
+              <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: "pick_scale_#{scale.gsub(':', '_')}" %>
+              <%= label_tag "pick_scale_#{scale.gsub(':', '_')}", scale, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:scale] == scale ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Brand %>
+      <% if @brands.any? %>
+        <div data-controller="pill-select" data-action="change->pill-select#refresh">
+          <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Brand</div>
+          <div class="flex flex-wrap gap-2">
+            <%= f.radio_button :brand, "", checked: params[:brand].blank?, class: "hidden", id: "pick_brand_all" %>
+            <%= label_tag "pick_brand_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:brand].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% @brands.each do |brand| %>
+              <%= f.radio_button :brand, brand, checked: params[:brand] == brand, class: "hidden", id: "pick_brand_#{brand.parameterize}" %>
+              <%= label_tag "pick_brand_#{brand.parameterize}", brand, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:brand] == brand ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+
+    <button type="submit" name="roll" value="1"
+            class="w-full bg-[#e879a0] hover:bg-[#f0a0c0] text-white font-bold py-3 rounded-xl text-lg transition-colors cursor-pointer">
+      🎲 Pick for me!
+    </button>
+  <% end %>
+
+  <%# Result %>
+  <% if @picked %>
+    <div class="mt-8 bg-[#1e1a2e] border border-[#e879a0]/30 rounded-xl overflow-hidden">
+      <% if @picked.image_url.present? %>
+        <img src="<%= @picked.image_url %>" alt="<%= @picked.title %>" class="w-full bg-[#251f33]">
+      <% end %>
+      <div class="p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 min-w-0 mb-1">
+              <h2 class="text-xl font-bold text-[#f0e6ff] truncate min-w-0"><%= @picked.title %></h2>
+              <% if @picked.scalemates_url.present? %>
+                <%= link_to @picked.scalemates_url, target: "_blank", rel: "noopener noreferrer",
+                    class: "shrink-0 text-[#9d8faa] hover:text-[#e879a0] transition-colors p-1 -m-1 rounded" do %>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                <% end %>
+              <% end %>
+            </div>
+            <div class="text-[#9d8faa] text-sm"><%= [@picked.brand, @picked.scale, @picked.grade].compact.join(" · ") %></div>
+            <% if @picked.topic.present? %>
+              <div class="text-xs text-[#8b7fa0] mt-1"><%= @picked.topic %></div>
+            <% end %>
+          </div>
+          <span class="shrink-0 text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]">Unbuilt</span>
+        </div>
+      </div>
+    </div>
+
+  <% elsif params[:roll].present? %>
+    <div class="mt-8 text-center py-16 text-[#9d8faa]">
+      <div class="text-4xl mb-3">🤷</div>
+      <div class="text-lg font-medium text-[#f0e6ff]">No unbuilt kits match those filters</div>
+      <div class="text-sm mt-1">Try broadening your selection</div>
+    </div>
+  <% end %>
+
 </div>
