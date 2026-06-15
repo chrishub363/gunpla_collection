@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gunpla-collection
+    runtime: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec rails server -p $PORT"
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_MASTER_KEY
+        sync: false
