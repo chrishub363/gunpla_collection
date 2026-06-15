@@ -15,7 +15,6 @@
     <%= turbo_frame_tag "kits_grid", class: "flex-1 min-w-0" do %>
       <div data-controller="infinite-scroll">
         <% if @kits.any? %>
-          <div class="text-xs text-[#9d8faa] mb-3"><%= @pagy.count %> kits</div>
           <div class="rounded-xl overflow-hidden border border-[#2d2640]" id="kits_list">
             <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
           </div>

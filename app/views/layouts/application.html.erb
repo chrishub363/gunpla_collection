@@ -28,16 +28,26 @@
         </a>
 
         <%# Search bar %>
-        <%= form_with url: root_path, method: :get, class: "flex-1 max-w-xl" do |f| %>
+        <%= form_with url: root_path, method: :get, class: "flex-1 max-w-xl",
+            data: { controller: "auto-submit" } do |f| %>
           <%= f.hidden_field :tab, value: params[:tab] || "collection" %>
-          <div class="flex gap-2">
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9d8faa] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             <%= f.text_field :search,
                 value: params[:search],
                 placeholder: "Search kits...",
-                class: "flex-1 bg-[#251f33] border border-[#2d2640] rounded-lg px-4 py-2 text-[#f0e6ff] placeholder-[#9d8faa] focus:outline-none focus:border-[#e879a0] transition-colors" %>
-            <%= f.submit "Search",
-                class: "bg-[#e879a0] hover:bg-[#f0a0c0] text-white font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer shrink-0" %>
+                data: { auto_submit_target: "searchInput", action: "input->auto-submit#toggleClear" },
+                class: "w-full bg-[#251f33] border border-[#2d2640] rounded-lg pl-9 pr-8 py-2 text-[#f0e6ff] placeholder-[#9d8faa] focus:outline-none focus:border-[#e879a0] transition-colors" %>
+            <button type="button"
+                    data-auto-submit-target="clearBtn"
+                    data-action="click->auto-submit#clearAndSubmit"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-[#9d8faa] hover:text-[#f0e6ff] transition-colors text-sm leading-none <%= params[:search].present? ? '' : 'hidden' %>">
+              ✕
+            </button>
           </div>
+          <%= f.button "Search", class: "sr-only" %>
         <% end %>
 
         <%# Tab navigation %>
