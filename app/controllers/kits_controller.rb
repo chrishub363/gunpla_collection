@@ -37,16 +37,12 @@ class KitsController < ApplicationController
 
     # Filter options for sidebar (scoped to current tab)
     base = @tab == "wishlist" ? Kit.wishlist : Kit.collection
-    @grades  = base.where.not(grade_abbr: nil).distinct.pluck(:grade_abbr).sort
-    @scales  = base.distinct.pluck(:scale).compact.sort
-    @brands  = base.distinct.pluck(:brand).compact.sort
+    load_filter_options(base)
     @statuses = VALID_STATUSES.reject { |s| s == "wishlist" }
   end
 
   def pick
-    @grades = Kit.collection.where.not(grade_abbr: nil).distinct.pluck(:grade_abbr).sort
-    @scales = Kit.collection.distinct.pluck(:scale).compact.sort
-    @brands = Kit.collection.distinct.pluck(:brand).compact.sort
+    load_filter_options(Kit.collection)
 
     if params[:roll].present?
       candidates = Kit.unbuilt
@@ -58,6 +54,12 @@ class KitsController < ApplicationController
   end
 
   private
+
+  def load_filter_options(scope)
+    @grades = scope.where.not(grade_abbr: nil).distinct.pluck(:grade_abbr).sort
+    @scales = scope.distinct.pluck(:scale).compact.sort
+    @brands = scope.distinct.pluck(:brand).compact.sort
+  end
 
   def sort_column
     allowed = %w[title brand scale grade_abbr status]

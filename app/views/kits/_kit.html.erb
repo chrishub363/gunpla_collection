@@ -1,6 +1,6 @@
 <div class="flex gap-4 p-3 <%= index.odd? ? 'bg-[#211d2e]' : 'bg-[#1e1a2e]' %> hover:bg-[#251f33] transition-colors"
      data-filter-target="row"
-     data-filter-text="<%= [kit.title, kit.full_title, kit.brand, kit.scale, kit.grade, kit.topic].compact.join(' ').downcase %>">
+     data-filter-text="<%= kit.filter_text %>">
 
   <%# Box art %>
   <div class="shrink-0 w-36 h-24 bg-[#2d2640] rounded overflow-hidden">
@@ -13,18 +13,9 @@
   <div class="flex-1 min-w-0 flex flex-col justify-center">
     <div class="font-medium text-[#f0e6ff] flex items-center gap-1.5 min-w-0">
       <span class="truncate min-w-0"><%= kit.title %></span>
-      <% if kit.scalemates_url.present? %>
-        <%= link_to kit.scalemates_url, target: "_blank", rel: "noopener noreferrer",
-            class: "shrink-0 text-[#9d8faa] hover:text-[#e879a0] transition-colors p-1 -m-1 rounded" do %>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        <% end %>
-      <% end %>
+      <%= scalemates_link(kit) %>
     </div>
-    <div class="text-sm text-[#9d8faa] mt-0.5">
-      <%= [kit.brand, kit.scale, kit.grade].compact.join(" · ") %>
-    </div>
+    <div class="text-sm text-[#9d8faa] mt-0.5"><%= kit.subtitle %></div>
     <% if kit.topic.present? %>
       <div class="text-xs text-[#8b7fa0] mt-0.5 truncate"><%= kit.topic %></div>
     <% end %>
@@ -33,14 +24,7 @@
   <%# Status badge %>
   <% if local_assigns[:show_status] %>
     <div class="shrink-0 flex items-center">
-      <% case kit.status %>
-      <% when "completed" %>
-        <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-900/40 text-green-400">✓ Built</span>
-      <% when "in_progress" %>
-        <span class="text-xs font-medium px-2 py-1 rounded-full bg-amber-900/40 text-amber-400">⚙ Building</span>
-      <% when "unbuilt" %>
-        <span class="text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]">Unbuilt</span>
-      <% end %>
+      <%= status_badge(kit.status) %>
     </div>
   <% end %>
 

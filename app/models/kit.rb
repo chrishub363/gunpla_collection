@@ -58,6 +58,14 @@ class Kit < ApplicationRecord
   scope :in_progress, -> { where(status: "in_progress") }
   scope :unbuilt, -> { where(status: "unbuilt") }
 
+  def subtitle
+    [brand, scale, grade].compact.join(" · ")
+  end
+
+  def filter_text
+    [title, full_title, brand, scale, grade, topic].compact.join(" ").downcase
+  end
+
   private
 
   def normalize_grade_abbr

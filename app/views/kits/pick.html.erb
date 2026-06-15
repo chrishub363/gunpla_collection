@@ -14,10 +14,10 @@
           <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Grade</div>
           <div class="flex flex-wrap gap-2">
             <%= f.radio_button :grade, "", checked: params[:grade].blank?, class: "hidden", id: "pick_grade_all" %>
-            <%= label_tag "pick_grade_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:grade].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <%= label_tag "pick_grade_all", "All", class: pill_filter_label_class(params[:grade].blank?) %>
             <% @grades.each do |grade| %>
               <%= f.radio_button :grade, grade, checked: params[:grade] == grade, class: "hidden", id: "pick_grade_#{grade}" %>
-              <%= label_tag "pick_grade_#{grade}", grade, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:grade] == grade ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+              <%= label_tag "pick_grade_#{grade}", grade, class: pill_filter_label_class(params[:grade] == grade) %>
             <% end %>
           </div>
         </div>
@@ -29,10 +29,11 @@
           <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Scale</div>
           <div class="flex flex-wrap gap-2">
             <%= f.radio_button :scale, "", checked: params[:scale].blank?, class: "hidden", id: "pick_scale_all" %>
-            <%= label_tag "pick_scale_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:scale].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <%= label_tag "pick_scale_all", "All", class: pill_filter_label_class(params[:scale].blank?) %>
             <% @scales.each do |scale| %>
-              <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: "pick_scale_#{scale.gsub(':', '_')}" %>
-              <%= label_tag "pick_scale_#{scale.gsub(':', '_')}", scale, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:scale] == scale ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+              <% scale_id = "pick_scale_#{scale.gsub(':', '_')}" %>
+              <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: scale_id %>
+              <%= label_tag scale_id, scale, class: pill_filter_label_class(params[:scale] == scale) %>
             <% end %>
           </div>
         </div>
@@ -44,10 +45,11 @@
           <div class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-2">Brand</div>
           <div class="flex flex-wrap gap-2">
             <%= f.radio_button :brand, "", checked: params[:brand].blank?, class: "hidden", id: "pick_brand_all" %>
-            <%= label_tag "pick_brand_all", "All", class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:brand].blank? ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+            <%= label_tag "pick_brand_all", "All", class: pill_filter_label_class(params[:brand].blank?) %>
             <% @brands.each do |brand| %>
-              <%= f.radio_button :brand, brand, checked: params[:brand] == brand, class: "hidden", id: "pick_brand_#{brand.parameterize}" %>
-              <%= label_tag "pick_brand_#{brand.parameterize}", brand, class: "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors #{params[:brand] == brand ? 'bg-[#e879a0] text-white' : 'bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]'}" %>
+              <% brand_id = "pick_brand_#{brand.parameterize}" %>
+              <%= f.radio_button :brand, brand, checked: params[:brand] == brand, class: "hidden", id: brand_id %>
+              <%= label_tag brand_id, brand, class: pill_filter_label_class(params[:brand] == brand) %>
             <% end %>
           </div>
         </div>
@@ -72,21 +74,14 @@
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 min-w-0 mb-1">
               <h2 class="text-xl font-bold text-[#f0e6ff] truncate min-w-0"><%= @picked.title %></h2>
-              <% if @picked.scalemates_url.present? %>
-                <%= link_to @picked.scalemates_url, target: "_blank", rel: "noopener noreferrer",
-                    class: "shrink-0 text-[#9d8faa] hover:text-[#e879a0] transition-colors p-1 -m-1 rounded" do %>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                <% end %>
-              <% end %>
+              <%= scalemates_link(@picked) %>
             </div>
-            <div class="text-[#9d8faa] text-sm"><%= [@picked.brand, @picked.scale, @picked.grade].compact.join(" · ") %></div>
+            <div class="text-[#9d8faa] text-sm"><%= @picked.subtitle %></div>
             <% if @picked.topic.present? %>
               <div class="text-xs text-[#8b7fa0] mt-1"><%= @picked.topic %></div>
             <% end %>
           </div>
-          <span class="shrink-0 text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]">Unbuilt</span>
+          <div class="shrink-0"><%= status_badge(@picked.status) %></div>
         </div>
       </div>
     </div>
