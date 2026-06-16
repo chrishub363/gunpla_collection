@@ -4,18 +4,21 @@ class KitsController < ApplicationController
 
   def index
     @tab = params[:tab] || "collection"
+    @searching = params[:search].present?
     @kits = Kit.all
     @turbo_frame_request = request.headers["Turbo-Frame"] == "kits_grid"
 
-    # Tab filtering
-    if @tab == "wishlist"
-      @kits = @kits.wishlist
-    else
-      @kits = @kits.collection
+    # Tab filtering — skipped when a search query is present (search spans all kits)
+    unless @searching
+      if @tab == "wishlist"
+        @kits = @kits.wishlist
+      else
+        @kits = @kits.collection
+      end
     end
 
     # Search
-    if params[:search].present?
+    if @searching
       search = "%#{params[:search]}%"
       @kits = @kits.where(
         "title LIKE ? OR full_title LIKE ? OR topic LIKE ?",

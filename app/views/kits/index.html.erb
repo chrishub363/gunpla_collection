@@ -3,20 +3,21 @@
   <%= turbo_frame_tag "kits_grid" do %>
     <div data-controller="infinite-scroll">
       <div id="kits_list">
-        <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+        <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @searching || @tab != "wishlist" %>
       </div>
     </div>
   <% end %>
 
 <% else %>
   <%# Collection / Wishlist tab bar %>
-  <nav class="flex border-b border-[#2d2640] mb-6" aria-label="View">
+  <%# When searching, neither tab is active — we're showing results across all kits %>
+  <nav class="flex items-center border-b border-[#2d2640] mb-6" aria-label="View">
     <%= link_to "Collection", collection_path,
         data: { turbo_action: "advance", turbo_frame: "_top" },
-        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{(@tab || 'collection') == 'collection' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
+        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{!@searching && @tab == 'collection' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
     <%= link_to "Wishlist", wishlist_path,
         data: { turbo_action: "advance", turbo_frame: "_top" },
-        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{@tab == 'wishlist' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
+        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{!@searching && @tab == 'wishlist' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
   </nav>
 
   <%# Kit grid with filter + drawer controllers %>
@@ -33,7 +34,7 @@
         <div data-controller="infinite-scroll">
           <% if @kits.any? %>
             <div class="rounded-xl overflow-hidden border border-[#2d2640]" id="kits_list">
-              <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+              <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @searching || @tab != "wishlist" %>
             </div>
           <% else %>
             <div class="text-center py-24 text-[#9d8faa]">

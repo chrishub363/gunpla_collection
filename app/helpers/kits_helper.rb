@@ -18,6 +18,8 @@ module KitsHelper
       tag.span "⚙ Building", class: "text-xs font-medium px-2 py-1 rounded-full bg-amber-900/40 text-amber-400"
     when "unbuilt"
       tag.span "Unbuilt",    class: "text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]"
+    when "wishlist"
+      tag.span "Wishlist",   class: "text-xs font-medium px-2 py-1 rounded-full bg-purple-900/40 text-purple-300"
     end
   end
 
