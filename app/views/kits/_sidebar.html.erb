@@ -1,4 +1,20 @@
-<aside class="w-56 shrink-0">
+<aside data-drawer-target="drawer"
+       class="fixed top-0 right-0 h-full w-72 z-50 p-5 bg-[#1a1625] border-l border-[#2d2640] overflow-y-auto translate-x-full transition-transform duration-300 ease-in-out
+              md:static md:translate-x-0 md:w-56 md:h-auto md:z-auto md:p-0 md:bg-transparent md:border-l-0 md:overflow-visible md:transition-none shrink-0">
+
+  <%# Mobile-only header with close button %>
+  <div class="flex items-center justify-between mb-6 md:hidden">
+    <h2 class="text-sm font-semibold text-[#f0e6ff]">Filters</h2>
+    <button type="button"
+            data-action="click->drawer#close"
+            class="text-[#9d8faa] hover:text-[#f0e6ff] transition-colors p-1 -mr-1">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      <span class="sr-only">Close filters</span>
+    </button>
+  </div>
+
   <%# Client-side live filter — no form submission %>
   <div class="mb-6">
     <h3 class="text-xs font-semibold uppercase tracking-widest text-[#9d8faa] mb-3">Filter</h3>
