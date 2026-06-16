@@ -9,7 +9,17 @@
   <% end %>
 
 <% else %>
-  <%# Full page load or filter — render complete layout %>
+  <%# Collection / Wishlist tab bar %>
+  <nav class="flex border-b border-[#2d2640] mb-6" aria-label="View">
+    <%= link_to "Collection", collection_path,
+        data: { turbo_action: "advance", turbo_frame: "_top" },
+        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{(@tab || 'collection') == 'collection' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
+    <%= link_to "Wishlist", wishlist_path,
+        data: { turbo_action: "advance", turbo_frame: "_top" },
+        class: "px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors #{@tab == 'wishlist' ? 'border-[#e879a0] text-[#f0e6ff]' : 'border-transparent text-[#9d8faa] hover:text-[#f0e6ff] hover:border-[#9d8faa]'}" %>
+  </nav>
+
+  <%# Kit grid with filter + drawer controllers %>
   <div data-controller="filter drawer">
 
     <%# Backdrop — fullscreen overlay, tapping closes the drawer on mobile %>
