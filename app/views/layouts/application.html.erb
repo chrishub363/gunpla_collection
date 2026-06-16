@@ -53,7 +53,7 @@
             <%= f.text_field :search,
                 value: params[:search],
                 placeholder: "Search kits...",
-                data: { auto_submit_target: "searchInput", action: "input->auto-submit#toggleClear input->auto-submit#submitWithDelay" },
+                data: { auto_submit_target: "searchInput", action: "input->auto-submit#toggleClear" },
                 class: "w-full bg-[#251f33] border border-[#2d2640] rounded-lg pl-9 pr-8 py-2 text-[#f0e6ff] placeholder-[#9d8faa] focus:outline-none focus:border-[#e879a0] transition-colors" %>
             <button type="button"
                     data-auto-submit-target="clearBtn"
