@@ -15,5 +15,8 @@ export default class extends Controller {
     } catch (e) {
       // Private mode / storage disabled — theme still applies for this session.
     }
+
+    const favicon = document.getElementById("favicon")
+    if (favicon) favicon.href = next === "light" ? "/icon-rx78.svg" : "/icon-titans.svg"
   }
 }

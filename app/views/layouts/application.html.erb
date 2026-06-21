@@ -26,8 +26,16 @@
     <%= csp_meta_tag %>
     <%= yield :head %>
     <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/svg+xml" id="favicon" href="/icon-rx78.svg">
     <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Match the SVG favicon to the active theme (RX-78 in light, Titans in dark). %>
+    <script>
+      (function () {
+        var f = document.getElementById("favicon");
+        if (f) f.href = document.documentElement.classList.contains("light") ? "/icon-rx78.svg" : "/icon-titans.svg";
+      })();
+    </script>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
