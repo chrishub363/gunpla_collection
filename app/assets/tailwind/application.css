@@ -1,19 +1,68 @@
 @import "tailwindcss";
 
+/*
+ * Two themes, two factions.
+ *   Dark  = Titans   (navy/black armor, Mk-II gold accents) — the @theme default
+ *   Light = RX-78-2  (muted Gundam white, navy ink, hero red) — :root.light override
+ *
+ * Every utility reads these via var(), so flipping the class on <html>
+ * re-skins the whole app. Tokens declared here generate bg-*, text-*, border-* etc.
+ */
 @theme {
   /* Surfaces — darkest (page) to lightest (borders / chips) */
-  --color-bg:       #1a1625; /* page background */
-  --color-panel:    #1e1a2e; /* header, cards, even rows */
-  --color-surface:  #211d2e; /* alternating odd rows */
-  --color-elevated: #251f33; /* inputs, hover states */
-  --color-border:   #2d2640; /* borders and subtle fills */
+  --color-bg:       #0e1119; /* page background */
+  --color-panel:    #161b29; /* header, cards, even rows */
+  --color-surface:  #1b2131; /* alternating odd rows */
+  --color-elevated: #232b40; /* inputs, hover states */
+  --color-border:   #313b57; /* borders and subtle fills */
 
   /* Text */
-  --color-ink:   #f0e6ff; /* primary text */
-  --color-muted: #9d8faa; /* secondary / muted text */
-  --color-dim:   #8b7fa0; /* tertiary / dim text */
+  --color-ink:   #e3e8f3; /* primary text */
+  --color-muted: #8a95ae; /* secondary / muted text */
+  --color-dim:   #5e6880; /* tertiary / dim text */
 
-  /* Accent */
-  --color-accent:       #e879a0;
-  --color-accent-hover: #f0a0c0;
+  /* Accent — Gundam Mk-II gold */
+  --color-accent:       #c7a24c;
+  --color-accent-hover: #d8b65e;
+  --color-on-accent:    #14181f; /* text/icons sitting on the accent fill */
+
+  /* Status badges (bg + foreground pairs) */
+  --color-built-bg:    #1b3226;
+  --color-built-fg:    #5fb87c;
+  --color-building-bg: #332b15;
+  --color-building-fg: #d2b25c;
+  --color-wishlist-bg: #1e2a45;
+  --color-wishlist-fg: #8aa6e0;
+}
+
+/* RX-78-2 — muted hero colors. Applied when <html> carries the .light class
+   (set before first paint by the inline script in the layout head). */
+@layer base {
+  :root.light {
+    --color-bg:       #e8e5dc; /* muted gundam white */
+    --color-panel:    #f4f2ec;
+    --color-surface:  #eeebe3;
+    --color-elevated: #dcd8cc;
+    --color-border:   #cac5b7;
+
+    --color-ink:   #1d2840; /* deep RX-78 navy */
+    --color-muted: #57607a;
+    --color-dim:   #868b9c;
+
+    --color-accent:       #b23a36; /* hero red */
+    --color-accent-hover: #c64a44;
+    --color-on-accent:    #fbf7f0;
+
+    --color-built-bg:    #dce9dd;
+    --color-built-fg:    #2d6a41;
+    --color-building-bg: #f3ebc9;
+    --color-building-fg: #876b1b;
+    --color-wishlist-bg: #dbe4f3;
+    --color-wishlist-fg: #2e4c87;
+  }
+
+  /* Theme-toggle icons: show the icon for the theme you'd switch TO. */
+  .theme-icon { display: none; }
+  :root:not(.light) .theme-icon-to-light { display: block; } /* in dark → offer sun */
+  :root.light .theme-icon-to-dark { display: block; }        /* in light → offer moon */
 }

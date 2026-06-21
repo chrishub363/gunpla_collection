@@ -13,23 +13,23 @@ module KitsHelper
   def status_badge(status)
     case status
     when "completed"
-      tag.span "✓ Built",    class: "text-xs font-medium px-2 py-1 rounded-full bg-green-900/40 text-green-400"
+      tag.span "✓ Built",    class: "text-xs font-medium px-2 py-1 rounded-full bg-built-bg text-built-fg"
     when "in_progress"
-      tag.span "⚙ Building", class: "text-xs font-medium px-2 py-1 rounded-full bg-amber-900/40 text-amber-400"
+      tag.span "⚙ Building", class: "text-xs font-medium px-2 py-1 rounded-full bg-building-bg text-building-fg"
     when "unbuilt"
       tag.span "Unbuilt",    class: "text-xs font-medium px-2 py-1 rounded-full bg-border text-muted"
     when "wishlist"
-      tag.span "Wishlist",   class: "text-xs font-medium px-2 py-1 rounded-full bg-purple-900/40 text-purple-300"
+      tag.span "Wishlist",   class: "text-xs font-medium px-2 py-1 rounded-full bg-wishlist-bg text-wishlist-fg"
     end
   end
 
   def sidebar_filter_label_class(active)
     base = "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors"
-    active ? "#{base} bg-accent text-white" : "#{base} text-muted hover:text-ink hover:bg-elevated"
+    active ? "#{base} bg-accent text-on-accent" : "#{base} text-muted hover:text-ink hover:bg-elevated"
   end
 
   def pill_filter_label_class(active)
     base = "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors"
-    active ? "#{base} bg-accent text-white" : "#{base} bg-elevated text-muted border border-border hover:text-ink"
+    active ? "#{base} bg-accent text-on-accent" : "#{base} bg-elevated text-muted border border-border hover:text-ink"
   end
 end
