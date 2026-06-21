@@ -1,9 +1,9 @@
-<div class="flex gap-4 p-3 <%= index.odd? ? 'bg-[#211d2e]' : 'bg-[#1e1a2e]' %> hover:bg-[#251f33] transition-colors"
+<div class="flex gap-4 p-3 <%= index.odd? ? 'bg-surface' : 'bg-panel' %> hover:bg-elevated transition-colors"
      data-filter-target="row"
      data-filter-text="<%= kit.filter_text %>">
 
   <%# Box art %>
-  <div class="shrink-0 w-36 h-24 bg-[#2d2640] rounded overflow-hidden">
+  <div class="shrink-0 w-36 h-24 bg-border rounded overflow-hidden">
     <% if kit.image_url.present? %>
       <img src="<%= kit.image_url %>" alt="<%= kit.title %>" class="w-full h-full object-cover">
     <% end %>
@@ -11,13 +11,13 @@
 
   <%# Kit info %>
   <div class="flex-1 min-w-0 flex flex-col justify-center">
-    <div class="font-medium text-[#f0e6ff] flex items-center gap-1.5 min-w-0">
+    <div class="font-medium text-ink flex items-center gap-1.5 min-w-0">
       <span class="truncate min-w-0"><%= kit.title %></span>
       <%= scalemates_link(kit) %>
     </div>
-    <div class="text-sm text-[#9d8faa] mt-0.5"><%= kit.subtitle %></div>
+    <div class="text-sm text-muted mt-0.5"><%= kit.subtitle %></div>
     <% if kit.topic.present? %>
-      <div class="text-xs text-[#8b7fa0] mt-0.5 truncate"><%= kit.topic %></div>
+      <div class="text-xs text-dim mt-0.5 truncate"><%= kit.topic %></div>
     <% end %>
   </div>
 

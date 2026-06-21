@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@theme {
+  /* Surfaces — darkest (page) to lightest (borders / chips) */
+  --color-bg:       #1a1625; /* page background */
+  --color-panel:    #1e1a2e; /* header, cards, even rows */
+  --color-surface:  #211d2e; /* alternating odd rows */
+  --color-elevated: #251f33; /* inputs, hover states */
+  --color-border:   #2d2640; /* borders and subtle fills */
+
+  /* Text */
+  --color-ink:   #f0e6ff; /* primary text */
+  --color-muted: #9d8faa; /* secondary / muted text */
+  --color-dim:   #8b7fa0; /* tertiary / dim text */
+
+  /* Accent */
+  --color-accent:       #e879a0;
+  --color-accent-hover: #f0a0c0;
+}

@@ -7,7 +7,7 @@ module KitsHelper
                   d: "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14")
     end
     link_to svg, kit.scalemates_url, target: "_blank", rel: "noopener noreferrer",
-            class: "shrink-0 text-[#9d8faa] hover:text-[#e879a0] transition-colors p-1 -m-1 rounded"
+            class: "shrink-0 text-muted hover:text-accent transition-colors p-1 -m-1 rounded"
   end
 
   def status_badge(status)
@@ -17,7 +17,7 @@ module KitsHelper
     when "in_progress"
       tag.span "⚙ Building", class: "text-xs font-medium px-2 py-1 rounded-full bg-amber-900/40 text-amber-400"
     when "unbuilt"
-      tag.span "Unbuilt",    class: "text-xs font-medium px-2 py-1 rounded-full bg-[#2d2640] text-[#9d8faa]"
+      tag.span "Unbuilt",    class: "text-xs font-medium px-2 py-1 rounded-full bg-border text-muted"
     when "wishlist"
       tag.span "Wishlist",   class: "text-xs font-medium px-2 py-1 rounded-full bg-purple-900/40 text-purple-300"
     end
@@ -25,11 +25,11 @@ module KitsHelper
 
   def sidebar_filter_label_class(active)
     base = "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors"
-    active ? "#{base} bg-[#e879a0] text-white" : "#{base} text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]"
+    active ? "#{base} bg-accent text-white" : "#{base} text-muted hover:text-ink hover:bg-elevated"
   end
 
   def pill_filter_label_class(active)
     base = "cursor-pointer px-3 py-1 rounded-full text-sm font-medium transition-colors"
-    active ? "#{base} bg-[#e879a0] text-white" : "#{base} bg-[#251f33] text-[#9d8faa] border border-[#2d2640] hover:text-[#f0e6ff]"
+    active ? "#{base} bg-accent text-white" : "#{base} bg-elevated text-muted border border-border hover:text-ink"
   end
 end

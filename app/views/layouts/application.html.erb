@@ -16,20 +16,20 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="h-full bg-[#1a1625] text-[#f0e6ff] antialiased">
+  <body class="h-full bg-bg text-ink antialiased">
 
     <%# Top navigation bar %>
-    <header class="sticky top-0 z-50 bg-[#1e1a2e] border-b border-[#2d2640] px-6 py-3">
+    <header class="sticky top-0 z-50 bg-panel border-b border-border px-6 py-3">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center gap-x-4 gap-y-3">
 
         <%# Logo / site name — always first %>
-        <a href="<%= root_path %>" class="text-[#e879a0] font-bold text-xl tracking-tight shrink-0 order-1">
+        <a href="<%= root_path %>" class="text-accent font-bold text-xl tracking-tight shrink-0 order-1">
           Gunpla Collection
         </a>
 
         <%# Pick link — top-right on mobile (order 2), far-right on desktop (order 3) %>
         <%= link_to pick_path,
-            class: "shrink-0 order-2 ml-auto md:ml-0 md:order-3 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-[#9d8faa] hover:text-[#f0e6ff] hover:bg-[#251f33]" do %>
+            class: "shrink-0 order-2 ml-auto md:ml-0 md:order-3 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-muted hover:text-ink hover:bg-elevated" do %>
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="2" width="20" height="20" rx="3" ry="3"/>
             <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
@@ -47,18 +47,18 @@
             data: { controller: "auto-submit" } do |f| %>
           <%= f.hidden_field :tab, value: params[:tab] || "collection" %>
           <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9d8faa] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <%= f.text_field :search,
                 value: params[:search],
                 placeholder: "Search kits...",
                 data: { auto_submit_target: "searchInput", action: "input->auto-submit#toggleClear" },
-                class: "w-full bg-[#251f33] border border-[#2d2640] rounded-lg pl-9 pr-8 py-2 text-[#f0e6ff] placeholder-[#9d8faa] focus:outline-none focus:border-[#e879a0] transition-colors" %>
+                class: "w-full bg-elevated border border-border rounded-lg pl-9 pr-8 py-2 text-ink placeholder-muted focus:outline-none focus:border-accent transition-colors" %>
             <button type="button"
                     data-auto-submit-target="clearBtn"
                     data-action="click->auto-submit#clearAndSubmit"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 text-[#9d8faa] hover:text-[#f0e6ff] transition-colors text-sm leading-none <%= params[:search].present? ? '' : 'hidden' %>">
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-ink transition-colors text-sm leading-none <%= params[:search].present? ? '' : 'hidden' %>">
               ✕
             </button>
           </div>

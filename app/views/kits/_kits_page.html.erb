@@ -7,6 +7,6 @@
     <%= link_to "Load more",
         request.path + "?" + request.query_parameters.merge(page: pagy.next).to_query,
         data: { turbo_frame: "kits_grid" },
-        class: "text-xs text-[#9d8faa]" %>
+        class: "text-xs text-muted" %>
   </div>
 <% end %>
