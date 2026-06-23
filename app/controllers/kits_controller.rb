@@ -17,13 +17,9 @@ class KitsController < ApplicationController
       end
     end
 
-    # Search
+    # Search — name only for now
     if @searching
-      search = "%#{params[:search]}%"
-      @kits = @kits.where(
-        "title LIKE ? OR full_title LIKE ? OR topic LIKE ?",
-        search, search, search
-      )
+      @kits = @kits.where("title LIKE ?", "%#{params[:search]}%")
     end
 
     # Filters
