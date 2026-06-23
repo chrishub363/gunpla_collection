@@ -1,5 +1,5 @@
 <%= turbo_stream.append "kits_list" do %>
-  <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @tab != "wishlist" %>
+  <%= render "kits_page", kits: @kits, pagy: @pagy %>
 <% end %>
 
 <%= turbo_stream.replace "scroll_sentinel" do %>

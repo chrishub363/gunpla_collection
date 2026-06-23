@@ -22,10 +22,8 @@
   </div>
 
   <%# Status badge %>
-  <% if local_assigns[:show_status] %>
-    <div class="shrink-0 flex items-center">
-      <%= status_badge(kit.status) %>
-    </div>
-  <% end %>
+  <div class="shrink-0 flex items-center">
+    <%= status_badge(kit.status) %>
+  </div>
 
 </div>

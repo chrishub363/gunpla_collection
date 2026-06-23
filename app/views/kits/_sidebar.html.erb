@@ -45,7 +45,7 @@
         <% @statuses.each do |status| %>
           <%= f.radio_button :status, status, checked: params[:status] == status, class: "hidden", id: "status_#{status}",
               data: { action: "change->auto-submit#submit" } %>
-          <%= label_tag "status_#{status}", status.humanize, class: sidebar_filter_label_class(params[:status] == status) %>
+          <%= label_tag "status_#{status}", status_label(status), class: sidebar_filter_label_class(params[:status] == status) %>
         <% end %>
       <% end %>
     <% end %>

@@ -3,7 +3,7 @@
   <%= turbo_frame_tag "kits_grid" do %>
     <div data-controller="infinite-scroll">
       <div id="kits_list">
-        <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @searching || @tab != "wishlist" %>
+        <%= render "kits_page", kits: @kits, pagy: @pagy %>
       </div>
     </div>
   <% end %>
@@ -34,7 +34,7 @@
         <div data-controller="infinite-scroll">
           <% if @kits.any? %>
             <div class="rounded-xl overflow-hidden border border-border" id="kits_list">
-              <%= render "kits_page", kits: @kits, pagy: @pagy, show_status: @searching || @tab != "wishlist" %>
+              <%= render "kits_page", kits: @kits, pagy: @pagy %>
             </div>
           <% else %>
             <div class="text-center py-24 text-muted">
