@@ -10,12 +10,14 @@ export default class extends Controller {
       const label = this.element.querySelector(`label[for="${input.id}"]`)
       if (!label) return
       const active = input.checked
-      label.classList.toggle("bg-[#e879a0]", active)
-      label.classList.toggle("text-white", active)
-      label.classList.toggle("bg-[#251f33]", !active)
-      label.classList.toggle("text-[#9d8faa]", !active)
+      // Must mirror pill_filter_label_class in kits_helper.rb.
+      label.classList.toggle("bg-accent", active)
+      label.classList.toggle("text-on-accent", active)
+      label.classList.toggle("bg-elevated", !active)
+      label.classList.toggle("text-muted", !active)
       label.classList.toggle("border", !active)
-      label.classList.toggle("border-[#2d2640]", !active)
+      label.classList.toggle("border-border", !active)
+      label.classList.toggle("hover:text-ink", !active)
     })
   }
 }
