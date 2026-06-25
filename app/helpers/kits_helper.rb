@@ -13,9 +13,15 @@ module KitsHelper
     STATUS_META.dig(status, :label) || status.humanize
   end
 
-  # Public path to a kit's locally-committed box art, or nil if it has none.
+  # Shown for kits with no valid box art (e.g. kits scraped before ScaleMates
+  # uploaded artwork). Content-addressed like every other image under
+  # public/kit_images; update this if the placeholder is ever regenerated.
+  PLACEHOLDER_IMAGE = "719b37dd4bbeefa25a17940dd7a1726d289890669755e8775fc1a00c7503ee15.jpg".freeze
+
+  # Public path to a kit's locally-committed box art, falling back to the
+  # placeholder silhouette when the kit has none.
   def kit_image_path(kit)
-    "/kit_images/#{kit.image}" if kit.image.present?
+    "/kit_images/#{kit.image.presence || PLACEHOLDER_IMAGE}"
   end
 
   def scalemates_link(kit)
