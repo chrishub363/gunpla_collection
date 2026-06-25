@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_000508) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_25_120000) do
   create_table "kits", force: :cascade do |t|
     t.string "brand"
     t.datetime "created_at", null: false
     t.string "full_title"
     t.string "grade"
     t.string "grade_abbr"
-    t.string "image_url"
+    t.string "image"
     t.string "scale"
     t.integer "scalemates_id"
     t.string "scalemates_url"

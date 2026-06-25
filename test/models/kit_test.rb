@@ -7,7 +7,7 @@
 #  full_title     :string
 #  grade          :string
 #  grade_abbr     :string
-#  image_url      :string
+#  image          :string
 #  scale          :string
 #  scalemates_url :string
 #  series         :string

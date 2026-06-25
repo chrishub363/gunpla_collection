@@ -13,6 +13,11 @@ module KitsHelper
     STATUS_META.dig(status, :label) || status.humanize
   end
 
+  # Public path to a kit's locally-committed box art, or nil if it has none.
+  def kit_image_path(kit)
+    "/kit_images/#{kit.image}" if kit.image.present?
+  end
+
   def scalemates_link(kit)
     return unless kit.scalemates_url.present?
     svg = content_tag(:svg, class: "w-4 h-4", fill: "none", viewBox: "0 0 24 24",

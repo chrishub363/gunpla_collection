@@ -4,8 +4,8 @@
 
   <%# Box art %>
   <div class="shrink-0 w-36 h-24 bg-border rounded overflow-hidden">
-    <% if kit.image_url.present? %>
-      <img src="<%= kit.image_url %>" alt="<%= kit.title %>" class="w-full h-full object-cover">
+    <% if kit.image.present? %>
+      <img src="<%= kit_image_path(kit) %>" alt="<%= kit.title %>" class="w-full h-full object-cover">
     <% end %>
   </div>
 

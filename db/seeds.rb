@@ -15,7 +15,7 @@ kits_data.each do |data|
     scale:          data["scale"],
     brand:          data["brand"],
     topic:          data["topic"],
-    image_url:      data["image_url"],
+    image:          data["image"],
     scalemates_id:  data["scalemates_id"],
     scalemates_url: data["scalemates_url"],
     status:         data["status"],

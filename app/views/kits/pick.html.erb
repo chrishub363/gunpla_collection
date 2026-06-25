@@ -66,8 +66,8 @@
   <%# Result %>
   <% if @picked %>
     <div class="mt-8 bg-panel border border-accent/30 rounded-xl overflow-hidden">
-      <% if @picked.image_url.present? %>
-        <img src="<%= @picked.image_url %>" alt="<%= @picked.title %>" class="w-full bg-elevated">
+      <% if @picked.image.present? %>
+        <img src="<%= kit_image_path(@picked) %>" alt="<%= @picked.title %>" class="w-full bg-elevated">
       <% end %>
       <div class="p-6">
         <div class="flex items-start justify-between gap-4">
