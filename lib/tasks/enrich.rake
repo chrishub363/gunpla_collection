@@ -42,6 +42,15 @@ namespace :enrich do
     total = all_rows.size
     kits = []
 
+    # Persist after every scrape via temp-file + atomic rename, so the JSON on
+    # disk is always a complete snapshot and an interruption never loses progress.
+    # On re-run, already-enriched kits are skipped, making this fully resumable.
+    write_json = lambda do |data|
+      tmp = "#{output_path}.tmp"
+      File.write(tmp, JSON.pretty_generate(data))
+      File.rename(tmp, output_path)
+    end
+
     all_rows.each_with_index do |entry, index|
       counter = "[#{(index + 1).to_s.rjust(total.to_s.length, "0")}/#{total}]"
       status = entry[:status]
@@ -60,14 +69,16 @@ namespace :enrich do
       begin
         enriched = scrape_kit(url, row, status, scalemates_id)
         kits << enriched
+        write_json.call(kits)
         sleep 1
       rescue StandardError => e
         puts "  ERROR: #{e.message} — using CSV data only"
         kits << csv_fallback(row, status, scalemates_id, url)
+        write_json.call(kits)
       end
     end
 
-    output_path.write(JSON.pretty_generate(kits))
+    write_json.call(kits)
     puts "\nDone! #{kits.size} kits written to #{output_path}"
   end
 
