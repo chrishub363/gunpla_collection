@@ -51,6 +51,16 @@ namespace :enrich do
       File.rename(tmp, output_path)
     end
 
+    # Per-product scraped data (image_url, full_title, grade) is identical for
+    # every owned copy of a kit, so cache it by scalemates_id and scrape each id
+    # at most once. Status and the other CSV columns are per-copy and always come
+    # from the current row — this is what keeps two copies of the same kit (e.g.
+    # one built, one not) from collapsing onto a single status.
+    scraped = {}
+    existing.each_value do |kit|
+      scraped[kit["scalemates_id"]] = kit if enriched_complete?(kit)
+    end
+
     all_rows.each_with_index do |entry, index|
       counter = "[#{(index + 1).to_s.rjust(total.to_s.length, "0")}/#{total}]"
       status = entry[:status]
@@ -58,24 +68,32 @@ namespace :enrich do
       scalemates_id = entry[:scalemates_id]
       url = entry[:url]
 
-      if existing[scalemates_id] && enriched_complete?(existing[scalemates_id])
-        puts "#{counter} Skipping #{scalemates_id} (already enriched)"
-        kits << existing[scalemates_id]
-        next
-      end
-
-      puts "#{counter} Scraping #{scalemates_id}: #{row['Title']}..."
-
-      begin
-        enriched = scrape_kit(url, row, status, scalemates_id)
-        kits << enriched
-        write_json.call(kits)
+      product = scraped[scalemates_id]
+      if product
+        puts "#{counter} Reusing #{scalemates_id} (#{row['Title']})"
+      else
+        puts "#{counter} Scraping #{scalemates_id}: #{row['Title']}..."
+        begin
+          product = scrape_kit(url, row, status, scalemates_id)
+        rescue StandardError => e
+          puts "  ERROR: #{e.message} — using CSV data only"
+          product = csv_fallback(row, status, scalemates_id, url)
+        end
+        scraped[scalemates_id] = product
         sleep 1
-      rescue StandardError => e
-        puts "  ERROR: #{e.message} — using CSV data only"
-        kits << csv_fallback(row, status, scalemates_id, url)
-        write_json.call(kits)
       end
+
+      # Combine the shared product data with this copy's own status/CSV fields.
+      kits << product.merge(
+        "status"         => status,
+        "title"          => row["Title"],
+        "scale"          => row["Scale"],
+        "brand"          => row["Brand"],
+        "topic"          => row["Topic"],
+        "scalemates_id"  => scalemates_id,
+        "scalemates_url" => url
+      )
+      write_json.call(kits)
     end
 
     write_json.call(kits)
