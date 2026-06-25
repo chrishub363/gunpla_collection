@@ -58,7 +58,7 @@ namespace :enrich do
       scalemates_id = entry[:scalemates_id]
       url = entry[:url]
 
-      if existing[scalemates_id]
+      if existing[scalemates_id] && enriched_complete?(existing[scalemates_id])
         puts "#{counter} Skipping #{scalemates_id} (already enriched)"
         kits << existing[scalemates_id]
         next
@@ -135,6 +135,20 @@ namespace :enrich do
     grade_patterns.each_with_object(nil) do |(pattern, name), _found|
       break name if h1.match?(pattern)
     end
+  end
+
+  # A kit counts as fully enriched only if the scrape produced a title and a
+  # usable box-art source. Kits scraped before ScaleMates uploaded artwork get a
+  # placeholder image_url (".../products/img/" with no file), so re-running
+  # enrich:kits retries them instead of skipping them forever.
+  def enriched_complete?(kit)
+    kit["full_title"].present? && valid_image_url?(kit["image_url"])
+  end
+
+  def valid_image_url?(url)
+    return false if url.blank?
+
+    url.split("?").first.match?(/\.(jpe?g|png|webp)\z/i)
   end
 
   def csv_fallback(row, status, scalemates_id, url)
