@@ -40,7 +40,9 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="h-full bg-bg text-ink antialiased">
+  <body class="h-full bg-bg text-ink antialiased"
+        data-controller="lightbox"
+        data-action="keydown@window->lightbox#closeOnEscape">
 
     <%# Top navigation bar %>
     <header class="sticky top-0 z-50 bg-panel border-b border-border px-6 py-3">
@@ -113,6 +115,14 @@
     <main class="max-w-7xl mx-auto px-6 py-6">
       <%= yield %>
     </main>
+
+    <%# Full-size image viewer — opened by clicking any kit image %>
+    <div data-lightbox-target="overlay"
+         data-action="click->lightbox#close"
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 opacity-0 pointer-events-none transition-opacity duration-200 cursor-zoom-out">
+      <img data-lightbox-target="image" src="" alt=""
+           class="max-w-full max-h-full object-contain rounded shadow-2xl">
+    </div>
 
   </body>
 </html>

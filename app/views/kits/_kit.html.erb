@@ -4,7 +4,10 @@
 
   <%# Box art %>
   <div class="shrink-0 w-36 h-24 bg-border rounded overflow-hidden">
-    <img src="<%= kit_image_path(kit) %>" alt="<%= kit.title %>" class="w-full h-full object-cover">
+    <img src="<%= kit_image_path(kit) %>" alt="<%= kit.title %>"
+         data-action="click->lightbox#open"
+         data-lightbox-src-param="<%= kit_image_path(kit) %>"
+         class="w-full h-full object-cover cursor-zoom-in">
   </div>
 
   <%# Kit info %>
