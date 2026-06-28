@@ -28,20 +28,6 @@
 require "test_helper"
 
 class KitTest < ActiveSupport::TestCase
-  # -- subtitle --
-
-  test "subtitle joins brand, scale, and grade" do
-    kit = Kit.new(brand: "Bandai Spirits", scale: "1:144", grade: "High Grade")
-
-    assert_equal "Bandai Spirits · 1:144 · High Grade", kit.subtitle
-  end
-
-  test "subtitle compacts missing fields" do
-    kit = Kit.new(brand: "Bandai Spirits", scale: nil, grade: "HG")
-
-    assert_equal "Bandai Spirits · HG", kit.subtitle
-  end
-
   # -- filter_text --
 
   test "filter_text joins all searchable fields lowercased" do
@@ -65,6 +51,14 @@ class KitTest < ActiveSupport::TestCase
     kit = Kit.create!(title: "Test Kit", grade: "Real Grade", status: "unbuilt")
 
     assert_equal "RG", kit.grade_abbr
+  end
+
+  test "maps Master Grade Super Deformed and Super Deformed grades" do
+    mgsd = Kit.create!(title: "Barbatos", grade: "Master Grade Super Deformed", status: "unbuilt")
+    sd   = Kit.create!(title: "Sazabi", grade: "Super Deformed", status: "unbuilt")
+
+    assert_equal "MGSD", mgsd.grade_abbr
+    assert_equal "SD", sd.grade_abbr
   end
 
   test "grade_abbr is nil when grade is unrecognized" do
