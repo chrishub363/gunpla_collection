@@ -147,7 +147,7 @@ It accepts a few flags:
 | Flag | What it does |
 |------|--------------|
 | `--reset` | Drop, recreate, and reseed the database from `enriched_kits.json` |
-| `--refresh` | Run the full pipeline — `scalemates:export` (opens a browser to log in) → `enrich:kits` → `kit_images:fetch` → reseed — refreshing the committed dataset from ScaleMates |
+| `--refresh` | Run the full pipeline — `scalemates:export` (opens a browser to log in) → `enrich:kits` → `kit_images:fetch` → `kit_images:prune` → reseed — refreshing the committed dataset from ScaleMates |
 | `--force` | With `--refresh`, re-scrape **every** kit (`enrich:kits[force]`) instead of skipping already-enriched ones — e.g. to backfill grades after a parser change |
 | `--skip-server` | Do the setup work but **don't** launch the app |
 

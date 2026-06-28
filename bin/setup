@@ -29,6 +29,7 @@ FileUtils.chdir APP_ROOT do
     enrich_task = ARGV.include?("--force") ? "enrich:kits[force]" : "enrich:kits"
     system! "bin/rails", enrich_task
     system! "bin/rails kit_images:fetch"
+    system! "bin/rails kit_images:prune" # drop images orphaned by re-scrapes
   end
 
   puts "\n== Preparing database =="

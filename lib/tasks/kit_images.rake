@@ -2,6 +2,7 @@ require "json"
 require "digest"
 require "open3"
 require "fileutils"
+require "set"
 
 namespace :kit_images do
   desc "Download box-art images referenced in enriched_kits.json into public/kit_images, content-addressed by SHA256. Use kit_images:fetch[force] to re-download everything."
@@ -60,6 +61,37 @@ namespace :kit_images do
     write_json.call(kits)
     puts "\nDone. #{downloaded} downloaded, #{skipped} already present, " \
          "#{missing} no source, #{failed} failed — #{total} total."
+  end
+
+  desc "Delete images in public/kit_images not referenced by enriched_kits.json (orphans left behind when a re-scrape returns slightly different bytes). Use kit_images:prune[dry] to preview without deleting."
+  task :prune, [ :mode ] => :environment do |_task, args|
+    $stdout.sync = true
+    dry = args[:mode] == "dry"
+
+    dir = Rails.root.join("public/kit_images")
+
+    referenced = JSON.parse(Rails.root.join("db/seeds/enriched_kits.json").read)
+      .map { |k| k["image"] }.compact.reject(&:empty?).to_set
+    referenced << KitsHelper::PLACEHOLDER_IMAGE # never prune the fallback silhouette
+
+    orphans = Dir.children(dir).select { |name| File.file?(dir.join(name)) && !referenced.include?(name) }
+
+    if orphans.empty?
+      puts "Nothing to prune — every image on disk is referenced."
+      next
+    end
+
+    mb = (orphans.sum { |name| File.size(dir.join(name)) } / 1024.0 / 1024).round(1)
+    puts "#{orphans.size} orphaned image(s), #{mb} MB#{dry ? ' (dry run)' : ''}:"
+    orphans.first(8).each { |name| puts "  #{name}" }
+    puts "  … and #{orphans.size - 8} more" if orphans.size > 8
+
+    if dry
+      puts "\nDry run — nothing deleted. Re-run as `kit_images:prune` to delete."
+    else
+      orphans.each { |name| File.delete(dir.join(name)) }
+      puts "\nDeleted #{orphans.size} orphaned image(s)."
+    end
   end
 
   # Downloads url, names the file by the SHA256 of its bytes, writes it to
