@@ -47,6 +47,7 @@ ScaleMates collection exports (CSV)         ← rake scalemates:export (or manua
         ▼
 db/seeds/enriched_kits.json
         │  rake kit_images:fetch             download photos → public/kit_images/
+        │  rake kit_images:prune             delete orphaned images
         ▼
 enriched_kits.json (+ image filenames) + committed image files
         │  rake db:seed                      rebuild the database
@@ -119,6 +120,18 @@ Both `enrich:kits` and `kit_images:fetch` write to `enriched_kits.json` after
 every kit (atomic temp-file + rename), so they are **resumable** — if
 interrupted, just re-run the same command and it continues where it left off.
 
+`kit_images:fetch` only ever *adds* files. Because ScaleMates re-encodes its
+artwork, a re-scrape often returns byte-different copies of the same image,
+leaving the previous versions behind as orphans. Prune them with:
+
+```bash
+bin/rails kit_images:prune          # delete images not referenced by enriched_kits.json
+bin/rails kit_images:prune[dry]     # preview what would be deleted, change nothing
+```
+
+The placeholder silhouette is always kept. (`bin/setup --refresh` runs this
+automatically after `kit_images:fetch`.)
+
 ### 4. Rebuild the database
 
 ```bash
@@ -128,7 +141,7 @@ bin/rails db:seed
 Wipes and rebuilds the `kits` table from `enriched_kits.json`.
 
 > **Typical workflow:** `scalemates:export` (refresh the CSVs) → `enrich:kits` →
-> `kit_images:fetch` → `db:seed`. Each step only does the new work; everything
+> `kit_images:fetch` → `kit_images:prune` → `db:seed`. Each step only does the new work; everything
 > already done is skipped. **Commit the updated `enriched_kits.json` and any new
 > files in `public/kit_images/`** so the next deploy can rebuild from them.
 
