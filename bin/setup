@@ -23,7 +23,11 @@ FileUtils.chdir APP_ROOT do
   if ARGV.include?("--refresh")
     puts "\n== Refreshing kit data from ScaleMates =="
     system! "bin/rails scalemates:export" # opens a browser to log in
-    system! "bin/rails enrich:kits"
+    # --force re-scrapes every kit (e.g. to backfill grades after a parser change)
+    # instead of skipping already-enriched ones. Passed as separate args so the
+    # square brackets aren't treated as a shell glob.
+    enrich_task = ARGV.include?("--force") ? "enrich:kits[force]" : "enrich:kits"
+    system! "bin/rails", enrich_task
     system! "bin/rails kit_images:fetch"
   end
 
