@@ -42,7 +42,7 @@ survive deploys without any object storage or persistent disk.
 ## Data pipeline
 
 ```
-ScaleMates collection exports (CSV)         ← you export these from ScaleMates
+ScaleMates collection exports (CSV)         ← rake scalemates:export (or manual)
         │  rake enrich:kits                  scrape metadata + image source URL
         ▼
 db/seeds/enriched_kits.json
@@ -56,15 +56,38 @@ kits table  →  app renders /kit_images/<sha256>.jpg
 
 ### 1. ScaleMates exports (required input)
 
-Export your collection from ScaleMates as CSV and place the files here, one per
-status:
+The pipeline needs four CSVs in `db/seeds/`, one per status:
 
-| File | Maps to status |
-|------|----------------|
-| `db/seeds/[My-Wishlist.csv](https://www.scalemates.com/profiles/stashexporter.php?type=W&format=csv)`  | `wishlist` |
-| `db/seeds/[My-Stash.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv)`     | `unbuilt` (owned) |
-| `db/seeds/[My-Started.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=BB)`   | `in_progress` |
-| `db/seeds/[My-Completed.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=D)` | `completed` |
+| File | Maps to status | Manual download |
+|------|----------------|-----------------|
+| `My-Wishlist.csv`  | `wishlist` | [link](https://www.scalemates.com/profiles/stashexporter.php?type=W&format=csv) |
+| `My-Stash.csv`     | `unbuilt` (owned) | [link](https://www.scalemates.com/profiles/stashexporter.php?format=csv) |
+| `My-Started.csv`   | `in_progress` | [link](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=BB) |
+| `My-Completed.csv` | `completed` | [link](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=D) |
+
+**Automated (recommended):**
+
+```bash
+bin/rails scalemates:export
+```
+
+ScaleMates has no API, and the export endpoints require a logged-in session, so
+this can't be fully headless. The task opens a Chromium window on ScaleMates —
+**you log in by hand** (which sidesteps CSRF, captchas and 2FA) and press Enter.
+It then lifts your session cookies out of the browser and uses them to download
+all four CSVs into `db/seeds/`. The browser is only used for login; the actual
+download reuses the same `curl` path as the rest of the pipeline. If a response
+doesn't look like a valid export (e.g. the login didn't take), that file is left
+unchanged rather than overwritten. The login profile is cached under `tmp/`, so
+subsequent runs usually skip straight past the login screen.
+
+Uses an installed Google Chrome if present; otherwise Selenium Manager downloads
+a self-contained Chrome for Testing build on first run (one-time, cached under
+`~/.cache/selenium`). Snap Chromium is intentionally not used — its bundled
+chromedriver doesn't work with WebDriver.
+
+**Manual:** alternatively, download each CSV from the links above (while logged
+into ScaleMates) and save it under `db/seeds/` with the filename shown.
 
 The enrichment reads the `Link`, `Title`, `Scale`, `Brand`, and `Topic` columns.
 The `Link` column (a ScaleMates product URL ending in `--<id>`) is required — its
@@ -104,10 +127,10 @@ bin/rails db:seed
 
 Wipes and rebuilds the `kits` table from `enriched_kits.json`.
 
-> **Typical workflow:** add kits to the CSVs → `enrich:kits` → `kit_images:fetch`
-> → `db:seed`. Each step only does the new work; everything already done is
-> skipped. **Commit the updated `enriched_kits.json` and any new files in
-> `public/kit_images/`** so the next deploy can rebuild from them.
+> **Typical workflow:** `scalemates:export` (refresh the CSVs) → `enrich:kits` →
+> `kit_images:fetch` → `db:seed`. Each step only does the new work; everything
+> already done is skipped. **Commit the updated `enriched_kits.json` and any new
+> files in `public/kit_images/`** so the next deploy can rebuild from them.
 
 ## Local development
 
@@ -124,7 +147,7 @@ It accepts a few flags:
 | Flag | What it does |
 |------|--------------|
 | `--reset` | Drop, recreate, and reseed the database from `enriched_kits.json` |
-| `--refresh` | Run `enrich:kits` + `kit_images:fetch` (incremental), then reseed — refreshes the committed dataset from ScaleMates |
+| `--refresh` | Run the full pipeline — `scalemates:export` (opens a browser to log in) → `enrich:kits` → `kit_images:fetch` → reseed — refreshing the committed dataset from ScaleMates |
 | `--skip-server` | Do the setup work but **don't** launch the app |
 
 Flags compose. `--refresh` only does the *new* scraping/downloading work (it uses

@@ -71,5 +71,9 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+end
+
+group :development, :test do
+  # Browser automation: system tests (test) and the scalemates:export task (development)
   gem "selenium-webdriver"
 end
