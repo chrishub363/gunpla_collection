@@ -1,6 +1,9 @@
 # Gunpla Collection
 
-A small Rails app for browsing and managing a Gunpla (Gundam plastic model) kit
+As much as I love ScaleMates its interface can be clunky and doesn't work great on mobile.
+My wife needed a simpler list she could use when shopping for gifts and here it is.
+
+This is a small Rails app for browsing and managing a Gunpla (Gundam plastic model) kit
 collection — what's owned, built, in progress, and on the wishlist — plus a
 "pick a kit" roulette for deciding what to build next. Kit metadata and box-art
 images are enriched from [ScaleMates](https://www.scalemates.com).
@@ -58,10 +61,10 @@ status:
 
 | File | Maps to status |
 |------|----------------|
-| `db/seeds/My-Wishlist.csv`  | `wishlist` |
-| `db/seeds/My-Stash.csv`     | `unbuilt` (owned) |
-| `db/seeds/My-Started.csv`   | `in_progress` |
-| `db/seeds/My-Completed.csv` | `completed` |
+| `db/seeds/[My-Wishlist.csv](https://www.scalemates.com/profiles/stashexporter.php?type=W&format=csv)`  | `wishlist` |
+| `db/seeds/[My-Stash.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv)`     | `unbuilt` (owned) |
+| `db/seeds/[My-Started.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=BB)`   | `in_progress` |
+| `db/seeds/[My-Completed.csv](https://www.scalemates.com/profiles/stashexporter.php?format=csv&type=D)` | `completed` |
 
 The enrichment reads the `Link`, `Title`, `Scale`, `Brand`, and `Topic` columns.
 The `Link` column (a ScaleMates product URL ending in `--<id>`) is required — its
