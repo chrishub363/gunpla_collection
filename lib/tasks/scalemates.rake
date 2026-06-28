@@ -88,7 +88,7 @@ namespace :scalemates do
     # Look less like an automated browser — ScaleMates sits behind bot protection
     # that flags the usual WebDriver tells. (It still blocks headless; run visible.)
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.exclude_switches = ["enable-automation"]
+    options.exclude_switches = [ "enable-automation" ]
 
     Selenium::WebDriver.for(:chrome, options: options)
   end
