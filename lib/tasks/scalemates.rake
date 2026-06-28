@@ -6,7 +6,6 @@
 # captchas and 2FA — then lift the session cookies out of the browser and reuse
 # them with curl to pull the four CSVs. The browser is only ever used for login.
 
-require "selenium-webdriver"
 require "open3"
 
 namespace :scalemates do
@@ -23,6 +22,12 @@ namespace :scalemates do
 
   desc "Open a browser to log into ScaleMates, then download the four stash CSVs into db/seeds/"
   task export: :environment do
+    # Required here, not at the top of the file: selenium-webdriver lives in the
+    # development/test bundle groups, which aren't installed in production. A
+    # top-level require crashes every rails/rake invocation on deploy, since
+    # Rails loads all lib/tasks/*.rake. This task is only ever run in development.
+    require "selenium-webdriver"
+
     dest = Rails.root.join("db/seeds")
 
     driver = build_driver
