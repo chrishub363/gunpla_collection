@@ -112,8 +112,31 @@ Wipes and rebuilds the `kits` table from `enriched_kits.json`.
 ## Local development
 
 ```bash
-bin/setup        # install dependencies, prepare the database
-bin/dev          # start the web server + Tailwind watcher
+bin/setup        # install dependencies, prepare the database, then start the app
 ```
 
-Then open http://localhost:3000.
+`bin/setup` ends by launching `bin/dev` (web server + Tailwind watcher), so a
+plain run gets you from a fresh clone to a running app. Then open
+http://localhost:3000.
+
+It accepts a few flags:
+
+| Flag | What it does |
+|------|--------------|
+| `--reset` | Drop, recreate, and reseed the database from `enriched_kits.json` |
+| `--refresh` | Run `enrich:kits` + `kit_images:fetch` (incremental), then reseed — refreshes the committed dataset from ScaleMates |
+| `--skip-server` | Do the setup work but **don't** launch the app |
+
+Flags compose. `--refresh` only does the *new* scraping/downloading work (it uses
+the non-`force` tasks), so it's safe to re-run. Because it ends by launching the
+app, pair it with `--skip-server` if you just want to refresh data and keep your
+shell:
+
+```bash
+bin/setup --refresh --skip-server   # update kit data, no server
+```
+
+Don't forget to **commit the updated `enriched_kits.json` and any new
+`public/kit_images/` files** afterward so the next deploy rebuilds from them.
+
+To start the server without the setup steps, run `bin/dev` directly.
