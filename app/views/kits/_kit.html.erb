@@ -16,7 +16,7 @@
       <span class="truncate min-w-0"><%= kit.title %></span>
       <%= scalemates_link(kit) %>
     </div>
-    <div class="text-sm text-muted mt-0.5"><%= kit.subtitle %></div>
+    <%= kit_attribute_tags(kit) %>
     <% if kit.topic.present? %>
       <div class="text-xs text-dim mt-0.5 truncate"><%= kit.topic %></div>
     <% end %>

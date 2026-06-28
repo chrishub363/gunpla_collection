@@ -73,7 +73,7 @@
         <% scale_id = "scale_#{scale.gsub(':', '_')}" %>
         <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: scale_id,
             data: { action: "change->auto-submit#submit" } %>
-        <%= label_tag scale_id, scale, class: sidebar_filter_label_class(params[:scale] == scale) %>
+        <%= label_tag scale_id, scale_label(scale), class: sidebar_filter_label_class(params[:scale] == scale) %>
       <% end %>
     <% end %>
 

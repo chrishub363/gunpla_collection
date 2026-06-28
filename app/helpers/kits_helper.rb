@@ -44,6 +44,110 @@ module KitsHelper
     end
   end
 
+  CHIP_BASE_CLASS = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium transition-colors".freeze
+
+  # The attribute chips under a kit's title (brand, scale, grade). Each chip is a
+  # toggle filter kept in sync with the sidebar: both derive their active state
+  # from the same query params, so selecting a filter in either place lights up
+  # the other. Clicking an active chip clears that facet. Blank attributes drop.
+  # scope: :collection renders chips as filter links (sidebar-synced navigation);
+  # :pick renders them as buttons that toggle the picker's filter radios in place
+  # (no navigation), staying in sync with the pills at the top of /pick.
+  def kit_attribute_tags(kit, scope: :collection)
+    chips = kit_attribute_chips(kit)
+    return if chips.empty?
+
+    div_data = scope == :pick ? { controller: "pick-chips" } : {}
+
+    tag.div class: "flex flex-wrap gap-1.5 mt-1", data: div_data do
+      safe_join(chips.map { |chip| kit_attribute_tag(chip, scope) })
+    end
+  end
+
+  # Chip descriptors: a label plus the facet (param key + value) it filters on.
+  # Grade displays its full name but filters by grade_abbr (what the controller
+  # and sidebar match on); a grade with no abbr has no key and renders plain.
+  def kit_attribute_chips(kit)
+    chips = []
+    chips << { label: kit.brand, key: :brand, value: kit.brand } if kit.brand.present?
+    chips << { label: scale_label(kit.scale), key: :scale, value: kit.scale } if kit.scale.present?
+    if kit.grade.present?
+      chips << { label: kit.grade, key: (:grade if kit.grade_abbr.present?), value: kit.grade_abbr }
+    end
+    chips
+  end
+
+  def kit_attribute_tag(chip, scope)
+    return tag.span(chip[:label], class: "#{CHIP_BASE_CLASS} bg-border text-muted") if chip[:key].blank?
+
+    active = params[chip[:key]].to_s == chip[:value].to_s
+    return pick_chip_button(chip, active) if scope == :pick
+
+    target = filtered_kits_path(chip[:key] => (active ? nil : chip[:value]))
+
+    # Break out of the kits_grid frame so a chip click re-renders the whole page
+    # (grid + sidebar) and updates the URL — keeping both filter surfaces in sync.
+    link_to chip[:label], target, "aria-pressed": active,
+            title: active ? "Remove #{chip[:label]} filter" : "Filter by #{chip[:label]}",
+            class: chip_class(active),
+            data: { turbo_action: "advance", turbo_frame: "_top" }
+  end
+
+  # A /pick chip: a button wired to the matching filter radio (and its "All"
+  # radio for toggling off). The pick-chips controller flips the radio and keeps
+  # the chip's styling in sync with the pills. ids mirror those in pick.html.erb.
+  def pick_chip_button(chip, active)
+    tag.button chip[:label], type: "button", "aria-pressed": active,
+               title: active ? "Remove #{chip[:label]} filter" : "Filter by #{chip[:label]}",
+               class: "#{chip_class(active)} cursor-pointer",
+               data: {
+                 pick_chips_target: "chip",
+                 action: "click->pick-chips#toggle",
+                 radio_id: pick_radio_id(chip[:key], chip[:value]),
+                 clear_id: "pick_#{chip[:key]}_all"
+               }
+  end
+
+  def pick_radio_id(key, value)
+    suffix =
+      case key
+      when :scale then value.gsub(":", "_")
+      when :brand then value.parameterize
+      else value # grade is already the abbr
+      end
+    "pick_#{key}_#{suffix}"
+  end
+
+  def chip_class(active)
+    if active
+      "#{CHIP_BASE_CLASS} bg-accent text-on-accent hover:bg-accent-hover"
+    else
+      "#{CHIP_BASE_CLASS} bg-border text-muted hover:text-ink"
+    end
+  end
+
+  # Current tab + filters, with the given facet override merged in (a nil value
+  # removes that facet). Drops pagination/search/roll so the link lands clean.
+  def filtered_kits_path(override)
+    preserved = params.permit(:tab, :status, :grade, :scale, :brand).to_h
+    root_path(preserved.merge(override.stringify_keys))
+  end
+
+  # ScaleMates exports scale-less kits with the literal scale "No"; show that as
+  # the clearer "No Scale". Returns nil for a genuinely blank scale.
+  def scale_label(scale)
+    return if scale.blank?
+    scale == "No" ? "No Scale" : scale
+  end
+
+  # Whether a sidebar filter section should render expanded, remembered per
+  # section in the `filter_sections` cookie (written client-side by the
+  # filter-section Stimulus controller). Keeps sections as the user left them
+  # across the reload a filter change triggers.
+  def filter_section_open?(title)
+    cookies[:filter_sections].to_s.split(",").include?(title)
+  end
+
   def sidebar_filter_label_class(active)
     base = "block px-3 py-1.5 rounded cursor-pointer text-sm transition-colors"
     active ? "#{base} bg-accent text-on-accent" : "#{base} text-muted hover:text-ink hover:bg-elevated"

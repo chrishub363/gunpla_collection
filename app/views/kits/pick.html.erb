@@ -33,7 +33,7 @@
             <% @scales.each do |scale| %>
               <% scale_id = "pick_scale_#{scale.gsub(':', '_')}" %>
               <%= f.radio_button :scale, scale, checked: params[:scale] == scale, class: "hidden", id: scale_id %>
-              <%= label_tag scale_id, scale, class: pill_filter_label_class(params[:scale] == scale) %>
+              <%= label_tag scale_id, scale_label(scale), class: pill_filter_label_class(params[:scale] == scale) %>
             <% end %>
           </div>
         </div>
@@ -79,7 +79,7 @@
               <h2 class="text-xl font-bold text-ink truncate min-w-0"><%= @picked.title %></h2>
               <%= scalemates_link(@picked) %>
             </div>
-            <div class="text-muted text-sm"><%= @picked.subtitle %></div>
+            <%= kit_attribute_tags(@picked, scope: :pick) %>
             <% if @picked.topic.present? %>
               <div class="text-xs text-dim mt-1"><%= @picked.topic %></div>
             <% end %>
