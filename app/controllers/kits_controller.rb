@@ -56,8 +56,15 @@ class KitsController < ApplicationController
 
   def load_filter_options(scope)
     @grades = scope.where.not(grade_abbr: nil).distinct.pluck(:grade_abbr).sort
-    @scales = scope.distinct.pluck(:scale).compact.sort
+    @scales = scope.distinct.pluck(:scale).compact.sort_by { |s| scale_sort_key(s) }
     @brands = scope.distinct.pluck(:brand).compact.sort
+  end
+
+  # Order scales by their denominator (1:1, 1:12, 1:18, ...) rather than
+  # alphabetically. Non-numeric values like "No" sort last.
+  def scale_sort_key(scale)
+    denominator = scale[/\A\d+:(\d+)\z/, 1]
+    denominator ? denominator.to_i : Float::INFINITY
   end
 
   def sort_column
