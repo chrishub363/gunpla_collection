@@ -142,9 +142,16 @@ namespace :enrich do
     grade_patterns = {
       /\AHigh Grade\b/i     => "High Grade",
       /\AReal Grade\b/i     => "Real Grade",
+      # MGSD must precede Master Grade so "Master Grade Super Deformed" isn't
+      # caught as plain MG. ScaleMates titles these "MGSD <name>".
+      /\AMGSD\b/i                          => "Master Grade Super Deformed",
+      /\AMaster Grade Super Deformed\b/i   => "Master Grade Super Deformed",
       /\AMaster Grade\b/i   => "Master Grade",
       /\APerfect Grade\b/i  => "Perfect Grade",
       /\ASuper Deformed\b/i => "Super Deformed",
+      # ScaleMates titles these "SD <name>" (e.g. "SD Gundam BB Senshi ..."). The
+      # \b stops it matching SD-family prefixes like SDCS/SDEX/SDBD (no boundary).
+      /\ASD\b/i             => "Super Deformed",
       /\AFull Mechanics\b/i => "Full Mechanics",
       /\AEntry Grade\b/i    => "Entry Grade",
       /\ANo Grade\b/i       => "No Grade"
