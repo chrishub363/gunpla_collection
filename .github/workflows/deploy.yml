@@ -1,0 +1,27 @@
+name: Deploy
+
+# Deploy to Render only after CI passes on main. Render auto-deploy is turned
+# off (autoDeploy: false in render.yaml) so this workflow is the single trigger:
+# merge to main -> CI runs -> if green, deploy; if red, nothing ships.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy when the CI run actually succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK secret is not set — add it in Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK"
+          echo "Deploy triggered on Render."
