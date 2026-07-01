@@ -58,8 +58,11 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  gem "rubocop-minitest", require: false
   gem "rubocop-performance", require: false
+
+  # Testing with RSpec + FactoryBot
+  gem "rspec-rails"
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -69,11 +72,11 @@ group :development do
 end
 
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  # HTML assertions in request specs via Capybara matchers (have_css, etc.)
   gem "capybara"
 end
 
 group :development, :test do
-  # Browser automation: system tests (test) and the scalemates:export task (development)
+  # Browser automation for the scalemates:export task
   gem "selenium-webdriver"
 end
