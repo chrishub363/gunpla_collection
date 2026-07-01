@@ -2,6 +2,9 @@ services:
   - type: web
     name: gunpla-collection
     runtime: ruby
+    # Deploys are triggered by GitHub Actions after CI passes on main
+    # (.github/workflows/deploy.yml), not automatically on push.
+    autoDeploy: false
     buildCommand: "./bin/render-build.sh"
     startCommand: "bundle exec rails server -p $PORT"
     envVars:
