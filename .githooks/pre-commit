@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Refuse commits made directly on a protected branch.
+# Work on a feature branch and merge via PR instead.
+#
+# Emergency bypass (use sparingly):  git commit --no-verify
+# Add more protected branches to the list below as needed.
+
+protected_branches=("main" "master")
+
+branch="$(git symbolic-ref --short -q HEAD)"
+
+for protected in "${protected_branches[@]}"; do
+  if [ "$branch" = "$protected" ]; then
+    echo "✋ Direct commits to '$protected' are blocked."
+    echo
+    echo "   Create a branch first, e.g.:"
+    echo "     git switch -c my-feature"
+    echo "     git commit ..."
+    echo
+    echo "   Then open a PR to merge into $protected."
+    echo
+    echo "   To override this once (not recommended): git commit --no-verify"
+    exit 1
+  fi
+done
+
+exit 0
