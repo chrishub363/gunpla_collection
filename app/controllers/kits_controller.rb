@@ -26,6 +26,7 @@ class KitsController < ApplicationController
     @kits = @kits.where(grade_abbr: params[:grade]) if params[:grade].present?
     @kits = @kits.where(scale: params[:scale]) if params[:scale].present?
     @kits = @kits.where(brand: params[:brand]) if params[:brand].present?
+    @kits = @kits.where(availability: params[:availability]) if params[:availability].present?
     @kits = @kits.where(status: params[:status]) if params[:status].present? && @tab != "wishlist"
 
     # Sorting
@@ -48,6 +49,7 @@ class KitsController < ApplicationController
       candidates = candidates.where(grade_abbr: params[:grade]) if params[:grade].present?
       candidates = candidates.where(scale: params[:scale]) if params[:scale].present?
       candidates = candidates.where(brand: params[:brand]) if params[:brand].present?
+      candidates = candidates.where(availability: params[:availability]) if params[:availability].present?
       @picked = candidates.order("RANDOM()").first
     end
   end
@@ -58,6 +60,9 @@ class KitsController < ApplicationController
     @grades = scope.where.not(grade_abbr: nil).distinct.pluck(:grade_abbr).sort
     @scales = scope.distinct.pluck(:scale).compact.sort_by { |s| scale_sort_key(s) }
     @brands = scope.distinct.pluck(:brand).compact.sort
+    # Ordered by AVAILABILITIES (retail, limited) rather than alphabetically, and
+    # limited to values actually present in the current scope.
+    @availabilities = Kit::AVAILABILITIES & scope.distinct.pluck(:availability)
   end
 
   # Order scales by their denominator (1:1, 1:12, 1:18, ...) rather than

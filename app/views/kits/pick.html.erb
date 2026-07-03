@@ -55,6 +55,21 @@
         </div>
       <% end %>
 
+      <%# Availability %>
+      <% if @availabilities.any? %>
+        <div data-controller="pill-select" data-action="change->pill-select#refresh">
+          <div class="text-xs font-semibold uppercase tracking-widest text-muted mb-2">Availability</div>
+          <div class="flex flex-wrap gap-2">
+            <%= f.radio_button :availability, "", checked: params[:availability].blank?, class: "hidden", id: "pick_availability_all" %>
+            <%= label_tag "pick_availability_all", "All", class: pill_filter_label_class(params[:availability].blank?) %>
+            <% @availabilities.each do |availability| %>
+              <%= f.radio_button :availability, availability, checked: params[:availability] == availability, class: "hidden", id: "pick_availability_#{availability}" %>
+              <%= label_tag "pick_availability_#{availability}", availability.capitalize, class: pill_filter_label_class(params[:availability] == availability) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
     </div>
 
     <button type="submit" name="roll" value="1"
@@ -75,14 +90,14 @@
       <div class="p-6">
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0">
-            <div class="flex items-center gap-1.5 min-w-0 mb-1">
+            <div class="min-w-0 mb-1">
               <h2 class="text-xl font-bold text-ink truncate min-w-0"><%= @picked.title %></h2>
-              <%= scalemates_link(@picked) %>
             </div>
             <%= kit_attribute_tags(@picked, scope: :pick) %>
             <% if @picked.topic.present? %>
               <div class="text-xs text-dim mt-1"><%= @picked.topic %></div>
             <% end %>
+            <%= kit_source_links(@picked) %>
           </div>
           <div class="shrink-0"><%= status_badge(@picked.status) %></div>
         </div>

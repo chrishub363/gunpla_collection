@@ -12,19 +12,19 @@
 
   <%# Kit info %>
   <div class="flex-1 min-w-0 flex flex-col justify-center">
-    <div class="font-medium text-ink flex items-center gap-1.5 min-w-0">
-      <span class="truncate min-w-0"><%= kit.title %></span>
-      <%= scalemates_link(kit) %>
+    <div class="font-medium text-ink min-w-0">
+      <span class="truncate min-w-0 block"><%= kit.title %></span>
     </div>
     <%= kit_attribute_tags(kit) %>
     <% if kit.topic.present? %>
       <div class="text-xs text-dim mt-0.5 truncate"><%= kit.topic %></div>
     <% end %>
+    <%= kit_source_links(kit) %>
   </div>
 
   <%# Status badge %>
   <div class="shrink-0 flex items-center">
-    <%= status_badge(kit.status) %>
+    <%= status_badge(kit.status, link: true) %>
   </div>
 
 </div>

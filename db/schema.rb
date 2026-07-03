@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_02_120000) do
   create_table "kits", force: :cascade do |t|
+    t.string "availability", default: "retail", null: false
     t.string "brand"
     t.datetime "created_at", null: false
     t.string "full_title"
@@ -26,6 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_120000) do
     t.string "title", null: false
     t.string "topic"
     t.datetime "updated_at", null: false
+    t.index ["availability"], name: "index_kits_on_availability"
     t.index ["grade_abbr"], name: "index_kits_on_grade_abbr"
     t.index ["scalemates_id"], name: "index_kits_on_scalemates_id"
     t.index ["series"], name: "index_kits_on_series"
