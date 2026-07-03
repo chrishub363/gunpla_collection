@@ -24,24 +24,83 @@ module KitsHelper
     "/kit_images/#{kit.image.presence || PLACEHOLDER_IMAGE}"
   end
 
-  def scalemates_link(kit)
-    return unless kit.scalemates_url.present?
-    svg = content_tag(:svg, class: "w-4 h-4", fill: "none", viewBox: "0 0 24 24",
-                      stroke: "currentColor", "stroke-width": "1.5") do
-      content_tag(:path, "", "stroke-linecap": "round", "stroke-linejoin": "round",
-                  d: "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14")
+  # The strip of outgoing "source" links under a kit: ScaleMates (the real
+  # scraped deep link) plus search links to the Gunpla wiki, a store, and eBay.
+  # Rendered as brand-coloured monogram tiles grouped in a pill so they read as
+  # "leave the site" links, distinct from the on-site filter chips above them.
+  def kit_source_links(kit)
+    tag.div class: "link-tiles mt-2" do
+      safe_join(kit_source_link_defs(kit).map { |l|
+        link_to l[:label], l[:url], target: "_blank", rel: "noopener noreferrer",
+                class: "link-tile #{l[:tile]}", title: l[:title]
+      })
     end
-    link_to svg, kit.scalemates_url, target: "_blank", rel: "noopener noreferrer",
-            class: "shrink-0 text-muted hover:text-accent transition-colors p-1 -m-1 rounded"
   end
 
-  def status_badge(status)
+  # Ordered link descriptors for a kit. ScaleMates is a stored deep link (dropped
+  # if absent); the rest are search links built from the kit's grade + title. The
+  # store slot follows availability: retail → USA Gundam Store, limited → P-Bandai
+  # (which carries most exclusives retail never stocks). See [[external-links-expansion]].
+  def kit_source_link_defs(kit)
+    q = ERB::Util.url_encode([ kit.grade_abbr, kit.title ].compact.join(" "))
+
+    defs = []
+    if kit.scalemates_url.present?
+      defs << { label: "SM", tile: "link-tile-sm", title: "View on ScaleMates", url: kit.scalemates_url }
+    end
+    defs << { label: "GW", tile: "link-tile-gw", title: "Search the Gunpla wiki",
+              url: "https://gunpla.fandom.com/wiki/Special:Search?query=#{q}&scope=internal" }
+    if kit.availability == "limited"
+      defs << { label: "PB", tile: "link-tile-pb", title: "Search P-Bandai (Bandai Hobby Online Shop)",
+                url: pbandai_search_url(q) }
+    else
+      defs << { label: "UG", tile: "link-tile-ug", title: "Search USA Gundam Store",
+                url: "https://www.usagundamstore.com/search?q=#{q}" }
+    end
+    defs << { label: "eB", tile: "link-tile-eb", title: "Search eBay",
+              url: "https://www.ebay.com/sch/i.html?_nkw=#{q}" }
+    defs
+  end
+
+  # Scoped to the Bandai Hobby Online Shop (_f_shops=05-0002) and set to include
+  # ended / no-longer-available items (_f_productStatuses=Waiting,On,End) so
+  # sold-out exclusives still surface. Param shape mirrors p-bandai.com's own
+  # search URLs; the comma in productStatuses is pre-encoded (%2C).
+  def pbandai_search_url(encoded_query)
+    "https://p-bandai.com/us/search?keyword=#{encoded_query}" \
+      "&offset=0&limit=20&sortType=Relevance" \
+      "&_f_productStatuses=Waiting%2COn%2CEnd&_f_shops=05-0002"
+  end
+
+  # The status pill. In the collection grid it doubles as a filter toggle
+  # (link: true) — clicking filters the collection by that status and breaks out
+  # of the kits_grid frame so grid + sidebar re-render in sync, exactly like the
+  # attribute chips. It keeps its semantic status color and gets an accent ring
+  # when its filter is active. Wishlist kits (and the wishlist tab, which has no
+  # status facet) always render a plain, non-clickable pill.
+  def status_badge(status, link: false)
     meta = STATUS_META[status]
     return unless meta
 
-    tag.span class: "inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full #{meta[:classes]}" do
-      safe_join([ status_icon(meta[:icon]), meta[:label] ])
-    end
+    content = safe_join([ status_icon(meta[:icon]), meta[:label] ])
+    base = "inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full #{meta[:classes]}"
+
+    return tag.span(content, class: base) unless link && status_filterable?(status)
+
+    active = params[:status].to_s == status
+    ring = active ? "ring-2 ring-accent" : "hover:ring-2 hover:ring-muted"
+
+    link_to content, filtered_kits_path(status: active ? nil : status),
+            "aria-pressed": active,
+            title: active ? "Remove #{meta[:label]} filter" : "Filter by #{meta[:label]}",
+            class: "#{base} transition-shadow #{ring}",
+            data: { turbo_action: "advance", turbo_frame: "_top" }
+  end
+
+  # Status filtering only applies to the collection tab — the wishlist tab has no
+  # status facet, and every wishlist kit shares the "wishlist" status.
+  def status_filterable?(status)
+    status != "wishlist" && @tab != "wishlist"
   end
 
   CHIP_BASE_CLASS = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium transition-colors".freeze
@@ -74,6 +133,7 @@ module KitsHelper
     if kit.grade.present?
       chips << { label: kit.grade, key: (:grade if kit.grade_abbr.present?), value: kit.grade_abbr }
     end
+    chips << { label: kit.availability.capitalize, key: :availability, value: kit.availability } if kit.availability.present?
     chips
   end
 
@@ -129,7 +189,7 @@ module KitsHelper
   # Current tab + filters, with the given facet override merged in (a nil value
   # removes that facet). Drops pagination/search/roll so the link lands clean.
   def filtered_kits_path(override)
-    preserved = params.permit(:tab, :status, :grade, :scale, :brand).to_h
+    preserved = params.permit(:tab, :status, :grade, :scale, :brand, :availability).to_h
     root_path(preserved.merge(override.stringify_keys))
   end
 

@@ -22,6 +22,27 @@ RSpec.describe "Kits", type: :request do
       expect(response).to have_http_status(:success)
     end
 
+    it "renders with an availability filter" do
+      get root_path, params: { availability: "limited" }
+
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders the status badge as a filter link on the collection" do
+      create(:kit, title: "Linkable Kit", status: "completed")
+
+      get root_path
+
+      expect(Capybara.string(response.body))
+        .to have_link("Built", href: /status=completed/)
+    end
+
+    it "renders with a status filter" do
+      get root_path, params: { status: "completed" }
+
+      expect(response).to have_http_status(:success)
+    end
+
     it "renders with a search query" do
       get root_path, params: { search: "Gundam" }
 
@@ -58,6 +79,15 @@ RSpec.describe "Kits", type: :request do
       get pick_path, params: { roll: "1", grade: "RG" }
 
       expect(Capybara.string(response.body)).to have_css("h2", text: /RG Aile Strike/)
+    end
+
+    it "restricts the pick to the selected availability filter" do
+      create(:kit, title: "Phenex P-Bandai", status: "unbuilt", availability: "limited")
+      create(:kit, title: "Shelf Zaku", status: "unbuilt", availability: "retail")
+
+      get pick_path, params: { roll: "1", availability: "limited" }
+
+      expect(Capybara.string(response.body)).to have_css("h2", text: /Phenex P-Bandai/)
     end
 
     it "shows an empty state when no kits match" do

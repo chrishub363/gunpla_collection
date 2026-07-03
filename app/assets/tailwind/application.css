@@ -53,10 +53,10 @@
     --color-accent-hover: #c64a44;
     --color-on-accent:    #fbf7f0;
 
-    --color-built-bg:    #dce9dd;
-    --color-built-fg:    #2d6a41;
-    --color-building-bg: #f3ebc9;
-    --color-building-fg: #876b1b;
+    --color-built-bg:    #b3dcbe; /* deeper fill + darker fg so the badge reads */
+    --color-built-fg:    #1c5030; /* against the cream page in light mode */
+    --color-building-bg: #ecd99a;
+    --color-building-fg: #6a5010;
     --color-wishlist-bg: #dbe4f3;
     --color-wishlist-fg: #2e4c87;
   }
@@ -65,4 +65,44 @@
   .theme-icon { display: none; }
   :root:not(.light) .theme-icon-to-light { display: block; } /* in dark → offer sun */
   :root.light .theme-icon-to-dark { display: block; }        /* in light → offer moon */
+}
+
+/* Outgoing "source" links — monogram tiles grouped in a pill, kept visually
+   distinct from the attribute chips (which are on-site filters). Muted at rest;
+   each lights up in its site's brand colour on hover. Brand colours are fixed
+   identity, so unlike the theme tokens they don't flip between dark and light. */
+@layer components {
+  .link-tiles {
+    display: inline-flex;
+    /* Sits in a flex column (.info), whose items stretch full-width by default;
+       flex-start keeps the pill hugging just its tiles. */
+    align-self: flex-start;
+    gap: 2px;
+    padding: 3px;
+    /* surface (row-level), not bg (darkest) — so the pill never sits darker than
+       the rows and reads as a soft group rather than a bold dark bar. */
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+  }
+  .link-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.375rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    background: var(--color-elevated);
+    color: var(--color-muted);
+    transition: background-color .15s, color .15s;
+  }
+  .link-tile:hover { color: #fff; }
+  .link-tile-sm:hover { background: #1d9e75; } /* ScaleMates — teal */
+  .link-tile-gw:hover { background: #d4537e; } /* Gunpla wiki — pink */
+  .link-tile-ug:hover { background: #d85a30; } /* USA Gundam Store — red/orange */
+  .link-tile-pb:hover { background: #c7a24c; color: var(--color-on-accent); } /* P-Bandai — gold */
+  .link-tile-eb:hover { background: #378add; } /* eBay — blue */
 }

@@ -90,5 +90,19 @@
       <% end %>
     <% end %>
 
+    <%# Availability filter %>
+    <% if @availabilities.any? %>
+      <%= render layout: "filter_section", locals: { title: "Availability" } do %>
+        <%= f.radio_button :availability, "", checked: params[:availability].blank?, class: "hidden", id: "availability_all",
+            data: { action: "change->auto-submit#submit" } %>
+        <%= label_tag "availability_all", "All", class: sidebar_filter_label_class(params[:availability].blank?) %>
+        <% @availabilities.each do |availability| %>
+          <%= f.radio_button :availability, availability, checked: params[:availability] == availability, class: "hidden", id: "availability_#{availability}",
+              data: { action: "change->auto-submit#submit" } %>
+          <%= label_tag "availability_#{availability}", availability.capitalize, class: sidebar_filter_label_class(params[:availability] == availability) %>
+        <% end %>
+      <% end %>
+    <% end %>
+
   <% end %>
 </aside>
